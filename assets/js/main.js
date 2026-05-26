@@ -229,7 +229,7 @@ document.getElementById('copyCodeBtn')?.addEventListener('click', () => {
 // زر التواصل عبر انستغرام
 document.getElementById('instagramBuyBtn')?.addEventListener('click', () => {
     if (!currentProduct) return;
-    const instagramUrl = "https://www.instagram.com/roya_store/";
+    const instagramUrl = "https://www.instagram.com/roya_rosse?igsh=MTV4MnU3OXBjZDJxcw==";
     const message = `مرحباً، أريد شراء المنتج التالي:\n\nالمنتج: ${currentProduct.name}\nالسعر: ${currentProduct.price} $\nرمز المنتج: ${currentProduct.code || generateProductCode()}`;
     window.open(`${instagramUrl}?text=${encodeURIComponent(message)}`, '_blank');
 });

@@ -215,6 +215,7 @@ function openProductModal(product) {
 document.getElementById('closeModalBtn')?.addEventListener('click', () => {
     document.getElementById('productModal').style.display = 'none';
     document.body.style.overflow = 'auto';
+    // لا نغلق productsSection هنا، نتركها مفتوحة
 });
 
 // زر نسخ الرمز
@@ -229,7 +230,7 @@ document.getElementById('copyCodeBtn')?.addEventListener('click', () => {
 // زر التواصل عبر انستغرام
 document.getElementById('instagramBuyBtn')?.addEventListener('click', () => {
     if (!currentProduct) return;
-    const instagramUrl = "https://www.instagram.com/roya_rosse?igsh=MTV4MnU3OXBjZDJxcw==";
+    const instagramUrl = "https://www.instagram.com/roya_store/";
     const message = `مرحباً، أريد شراء المنتج التالي:\n\nالمنتج: ${currentProduct.name}\nالسعر: ${currentProduct.price} $\nرمز المنتج: ${currentProduct.code || generateProductCode()}`;
     window.open(`${instagramUrl}?text=${encodeURIComponent(message)}`, '_blank');
 });
@@ -407,17 +408,20 @@ if (mobileInput) {
     }
 }
 
-// ===================== إغلاق نتائج البحث =====================
+// ===================== إغلاق نتائج البحث (مع استثناء نافذة المنتج) =====================
 document.addEventListener('click', function(e) {
     const productsSection = document.getElementById('productsSection');
     if (!productsSection || productsSection.style.display !== 'block') return;
+    
     const searchElements = [desktopInput, mobileInput, desktopSuggestions, mobileSuggestions, clearMobileBtn].filter(el => el !== null);
     const productCards = document.querySelectorAll('#productsScroll .product-card');
     const isInsideResults = productsSection.contains(e.target);
     const isInsideSearch = searchElements.some(el => el && el.contains(e.target));
     const isInsideProductCard = Array.from(productCards).some(card => card.contains(e.target));
     const isOnCategory = e.target.closest('.category-card') !== null;
-    if (!isInsideResults && !isInsideSearch && !isInsideProductCard && !isOnCategory) {
+    const isInsideModal = document.getElementById('productModal')?.contains(e.target);  // استثناء نافذة المنتج
+    
+    if (!isInsideResults && !isInsideSearch && !isInsideProductCard && !isOnCategory && !isInsideModal) {
         productsSection.style.display = 'none';
         document.body.style.overflow = 'auto';
         if (desktopSuggestions) desktopSuggestions.style.display = 'none';
@@ -465,7 +469,7 @@ document.getElementById('footerContactLink')?.addEventListener('click', (e) => {
 
 document.getElementById('wishlistIcon')?.addEventListener('click', () => alert('المفضلة قريباً'));
 
-// ===================== شاشة التحميل (ألوان أنثوية) =====================
+// ===================== شاشة التحميل =====================
 function showLoading() {
     let loader = document.getElementById('globalLoader');
     if (loader) { loader.style.display = 'flex'; return; }

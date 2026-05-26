@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>رويا - إكسسوارات أنثوية</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- شعار مؤقت (أيقونة وردة) -->
+    <link rel="icon" type="image/png" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%23FF9AAE'/%3E%3Ctext x='50' y='67' font-size='50' text-anchor='middle' fill='white' font-family='Arial'%3E🌸%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+
+    <!-- Navbar Desktop -->
+    <nav class="navbar-desktop">
+        <div class="nav-container">
+            <div class="logo">
+                <a href="index.html">
+                    <i class="fas fa-heart"></i>
+                    <span>رويا</span>
+                </a>
+            </div>
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="ابحث عن منتج..." id="searchInputDesktop">
+                <div id="suggestionsDesktop" class="suggestions-box"></div>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#" class="active">الرئيسية</a></li>
+                <li><a href="#" id="contactLink">تواصل معنا</a></li>
+            </ul>
+            <div class="nav-icons">
+                <i class="far fa-heart" id="wishlistIcon"></i>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Header -->
+    <div class="mobile-header">
+        <div class="mobile-logo">
+            <a href="index.html">
+                <i class="fas fa-heart"></i>
+                <span>رويا</span>
+            </a>
+        </div>
+        <div class="mobile-search-container">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInputMobile" placeholder="ابحث عن منتج...">
+            <button id="clearMobileSearch" class="clear-search-btn">✕</button>
+            <div id="suggestionsMobile" class="suggestions-box mobile-suggestions"></div>
+        </div>
+    </div>
+
+    <!-- Mobile Bottom Navbar -->
+    <div class="navbar-mobile">
+        <div class="mobile-nav-item active" data-page="home">
+            <i class="fas fa-home"></i>
+            <span>الرئيسية</span>
+        </div>
+        <div class="mobile-nav-item" data-page="categories">
+            <i class="fas fa-th-large"></i>
+            <span>الفئات</span>
+        </div>
+        <div class="mobile-nav-item" data-page="contact">
+            <i class="fab fa-instagram"></i>
+            <span>انستغرام</span>
+        </div>
+    </div>
+
+    <!-- سلايدر الإعلانات -->
+    <div class="ads-slider-container">
+        <div class="ads-slider" id="adsSlider"></div>
+        <button class="slider-btn prev" id="prevAdBtn">❮</button>
+        <button class="slider-btn next" id="nextAdBtn">❯</button>
+        <div class="slider-dots" id="sliderDots"></div>
+    </div>
+
+    <!-- شبكة الفئات -->
+    <div class="categories-grid" id="categoriesGrid"></div>
+
+    <!-- قسم المنتجات العشوائية -->
+    <div class="section-title">
+        <h2>✨ اكتشفي منتجات عشوائية</h2>
+        <p>تشكيلة مختارة لكِ</p>
+    </div>
+    <div class="scroll-products" id="randomProducts"></div>
+
+    <!-- نافذة عرض المنتجات -->
+    <div class="products-section" id="productsSection" style="display: none;">
+        <div class="products-header">
+            <button class="close-products" id="closeProductsBtn"><i class="fas fa-times"></i></button>
+            <h3 id="selectedCategoryTitle"></h3>
+        </div>
+        <div class="scroll-products" id="productsScroll"></div>
+    </div>
+
+    <!-- نافذة تفاصيل المنتج (تواصل عبر انستغرام) -->
+    <div class="product-modal" id="productModal" style="display: none;">
+        <div class="product-modal-content">
+            <button class="close-modal" id="closeModalBtn"><i class="fas fa-times"></i></button>
+            <div id="modalProductDetails" class="modal-product-details"></div>
+            <div class="product-code-box">
+                <strong>رمز المنتج:</strong> <span id="productCodeDisplay"></span>
+                <button id="copyCodeBtn" class="copy-code-btn">📋 نسخ</button>
+            </div>
+            <div class="payment-options">
+                <button class="instagram-btn" id="instagramBuyBtn">
+                    <i class="fab fa-instagram"></i> تواصل عبر انستغرام للشراء
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- مودال التواصل -->
+    <div id="contactModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>تواصل معنا</h3>
+            <p>انستغرام: <a href="https://instagram.com/roya_store" target="_blank">@roya_store</a></p>
+        </div>
+    </div>
+
+    <!-- فوتر -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h4><i class="fas fa-heart"></i> رويـا</h4>
+                <p>إكسسوارات أنثوية فاخرة</p>
+            </div>
+            <div class="footer-section">
+                <h4>تواصل معنا</h4>
+                <p><i class="fab fa-instagram"></i> <a href="https://instagram.com/roya_store" target="_blank">انستغرام: @roya_store</a></p>
+                <p><i class="fas fa-envelope"></i> <a href="mailto:info@roya.com">info@roya.com</a></p>
+            </div>
+            <div class="footer-section">
+                <h4>روابط سريعة</h4>
+                <p><a href="#" id="footerContactLink">اتصل بنا</a></p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>تم تصميم الموقع بواسطة <strong>Ahmad Kllawe</strong> © 2025</p>
+        </div>
+    </footer>
+
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    <script src="assets/js/main.js"></script>
+</body>
+</html>

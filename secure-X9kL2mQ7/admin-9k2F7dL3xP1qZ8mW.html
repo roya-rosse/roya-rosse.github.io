@@ -218,22 +218,32 @@
 
     // ===================== إعدادات Cloudinary =====================
     const CLOUDINARY_CLOUD_NAME = "dh6j108wj";
-    const CLOUDINARY_UPLOAD_PRESET = "my_store_preset";
+    const CLOUDINARY_UPLOAD_PRESET = "enath-shop";
 
     async function uploadImageToCloudinary(file) {
         const formData = new FormData();
         formData.append("file", file);
         formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
-        const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/upload`, {
-            method: "POST",
-            body: formData
-        });
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error?.message || "فشل رفع الصورة");
+        
+        try {
+            const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/upload`, {
+                method: "POST",
+                body: formData
+            });
+            
+            const data = await response.json();
+            
+            if (!response.ok) {
+                console.error("Cloudinary error:", data);
+                throw new Error(data.error?.message || "فشل رفع الصورة");
+            }
+            
+            console.log("Upload success:", data.secure_url);
+            return data.secure_url;
+        } catch (err) {
+            console.error("Upload error:", err);
+            throw err;
         }
-        const data = await response.json();
-        return data.secure_url;
     }
 
     function generateProductCode() { return 'ROY' + Math.random().toString(36).substring(2, 10).toUpperCase(); }
@@ -268,7 +278,7 @@
         renderFilteredProducts(lastSearchText);
     }
 
-    // ---------- الإعلانات (رفع صور مباشر) ----------
+    // ---------- الإعلانات ----------
     function renderAds() {
         const div = document.getElementById('adsList');
         div.innerHTML = ads.map(ad => `
@@ -335,7 +345,7 @@
         btn.disabled = false;
     };
 
-    // ---------- الفئات (رفع صور مباشر) ----------
+    // ---------- الفئات ----------
     function renderCategories() {
         const container = document.getElementById('categoriesList');
         container.innerHTML = categories.map(cat => `
@@ -402,7 +412,6 @@
     }
 
     window.editCategory = async (id) => {
-        const cat = categories.find(c => c.id === id);
         document.getElementById(`editCatForm_${id}`).style.display = 'block';
     };
     window.updateCatImage = async (id) => {
@@ -444,8 +453,8 @@
         if (!code) code = generateProductCode();
 
         const loader = document.getElementById(`uploadLoader_${catId}`);
-        loader.style.display = 'flex';
         const btn = event.target;
+        loader.style.display = 'flex';
         btn.disabled = true;
         try {
             const imageUrl = await uploadImageToCloudinary(imageFile);
@@ -460,7 +469,7 @@
             document.getElementById(`prodDesc_${catId}`).value = '';
             document.getElementById(`prodImgFile_${catId}`).value = '';
             document.getElementById(`prodCode_${catId}`).value = '';
-        } catch (err) { alert(err.message); }
+        } catch (err) { alert("خطأ في رفع الصورة: " + err.message); }
         loader.style.display = 'none';
         btn.disabled = false;
     };
@@ -492,14 +501,14 @@
     window.deleteProduct = async (id) => { products = products.filter(p => p.id !== id); await saveAll(); };
     window.toggleProduct = async (id) => { const prod = products.find(p => p.id === id); prod.active = !prod.active; await saveAll(); };
 
-    // إضافة فئة جديدة (رفع صورة مباشر)
+    // إضافة فئة جديدة
     document.getElementById('addCategoryBtn').onclick = async () => {
         const name = document.getElementById('newCatName').value.trim();
         const imageFile = document.getElementById('newCatImageFile').files[0];
         if (!name || !imageFile) { alert("اسم الفئة والصورة مطلوبان"); return; }
         const loader = document.getElementById('newCatLoader');
-        loader.style.display = 'flex';
         const btn = document.getElementById('addCategoryBtn');
+        loader.style.display = 'flex';
         btn.disabled = true;
         try {
             const imageUrl = await uploadImageToCloudinary(imageFile);
@@ -512,7 +521,7 @@
         btn.disabled = false;
     };
 
-    // ---------- جميع المنتجات (مع بحث بالاسم والرمز) ----------
+    // جميع المنتجات مع بحث
     function renderFilteredProducts(searchText) {
         const container = document.getElementById('productsList');
         const catsMap = Object.fromEntries(categories.map(c => [c.id, c.name]));

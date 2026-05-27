@@ -12,7 +12,6 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
-// ===================== المتغيرات العامة =====================
 let categories = [];
 let products = [];
 let ads = [];
@@ -24,7 +23,6 @@ function generateTempCode() {
     return 'ROY' + Math.random().toString(36).substring(2, 10).toUpperCase();
 }
 
-// ===================== تحميل البيانات =====================
 async function loadData() {
     showLoading();
     try {
@@ -187,7 +185,6 @@ document.getElementById('instagramBuyBtn')?.addEventListener('click', () => {
     window.open(`${instagramUrl}?text=${encodeURIComponent(message)}`, '_blank');
 });
 
-// ===================== السلايدر =====================
 function renderAds() {
     const activeAds = ads.filter(ad => ad.active);
     const slider = document.getElementById('adsSlider');
@@ -263,7 +260,6 @@ function resetAutoSlide(total) {
     }
 }
 
-// ===================== البحث (مع إصلاح زر الإغلاق) =====================
 function performSearch(keyword) {
     if (!keyword.trim()) {
         document.getElementById('productsSection').style.display = 'none';
@@ -299,20 +295,14 @@ function performSearch(keyword) {
 }
 
 function showSuggestions(inputElement, suggestionsContainer, keyword) {
-    if (!keyword.trim()) {
-        suggestionsContainer.style.display = 'none';
-        return;
-    }
+    if (!keyword.trim()) { suggestionsContainer.style.display = 'none'; return; }
     const term = keyword.trim().toUpperCase();
     const matched = products.filter(p => {
         const nameMatch = p.name.toUpperCase().includes(term);
         const codeMatch = p.code && p.code.toUpperCase().includes(term);
         return (nameMatch || codeMatch) && p.active;
     }).slice(0, 5);
-    if (matched.length === 0) {
-        suggestionsContainer.style.display = 'none';
-        return;
-    }
+    if (matched.length === 0) { suggestionsContainer.style.display = 'none'; return; }
     suggestionsContainer.innerHTML = matched.map(p => {
         const displayCode = p.code ? ` (${p.code})` : '';
         return `<div class="suggestion-item" data-name="${escapeHtml(p.name)}">${escapeHtml(p.name)}${displayCode}</div>`;
@@ -329,7 +319,6 @@ function showSuggestions(inputElement, suggestionsContainer, keyword) {
     });
 }
 
-// ربط أحداث البحث
 const desktopInput = document.getElementById('searchInputDesktop');
 const desktopSuggestions = document.getElementById('suggestionsDesktop');
 if (desktopInput) {
@@ -350,12 +339,9 @@ const mobileSuggestions = document.getElementById('suggestionsMobile');
 const clearMobileBtn = document.getElementById('clearMobileSearch');
 
 if (mobileInput) {
-    // عرض/إخفاء زر الإغلاق عند الكتابة
     mobileInput.addEventListener('input', (e) => {
         const val = e.target.value;
-        if (clearMobileBtn) {
-            clearMobileBtn.style.display = val ? 'block' : 'none';
-        }
+        if (clearMobileBtn) clearMobileBtn.style.display = val ? 'block' : 'none';
         showSuggestions(mobileInput, mobileSuggestions, val);
         if (val.trim() === '') {
             document.getElementById('productsSection').style.display = 'none';
@@ -365,7 +351,6 @@ if (mobileInput) {
         }
     });
 
-    // زر مسح النص (X)
     if (clearMobileBtn) {
         clearMobileBtn.addEventListener('click', () => {
             mobileInput.value = '';
@@ -383,7 +368,6 @@ document.getElementById('closeProductsBtn')?.addEventListener('click', () => {
     document.body.style.overflow = 'auto';
 });
 
-// إغلاق نتائج البحث عند النقر خارجها
 document.addEventListener('click', function(e) {
     const productsSection = document.getElementById('productsSection');
     if (!productsSection || productsSection.style.display !== 'block') return;
@@ -402,7 +386,6 @@ document.addEventListener('click', function(e) {
     }
 });
 
-// تنقل الموبايل
 document.querySelectorAll('.mobile-nav-item').forEach(item => {
     item.addEventListener('click', () => {
         const page = item.dataset.page;
@@ -421,7 +404,6 @@ document.querySelectorAll('.mobile-nav-item').forEach(item => {
     });
 });
 
-// مودال التواصل
 const modal = document.getElementById('contactModal');
 const contactLink = document.getElementById('contactLink');
 const closeBtn = document.querySelector('.close');
@@ -442,7 +424,6 @@ document.getElementById('footerContactLink')?.addEventListener('click', (e) => {
 
 document.getElementById('wishlistIcon')?.addEventListener('click', () => alert('المفضلة قريباً'));
 
-// شاشة التحميل
 function showLoading() {
     let loader = document.getElementById('globalLoader');
     if (loader) {

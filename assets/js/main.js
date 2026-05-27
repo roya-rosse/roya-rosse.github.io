@@ -81,7 +81,7 @@ function renderRandomProducts() {
             <img src="${p.image}" class="product-img" onerror="this.src='https://via.placeholder.com/300x500?text=صورة+غير+متوفرة'">
             <div class="product-info">
                 <div class="product-name">${escapeHtml(p.name)}</div>
-                <div><span class="product-price">${p.price} $</span>${p.oldprice ? `<span class="product-oldprice">${p.oldprice} $</span>` : ''}</div>
+                <div><span class="product-price">${p.price}$ </span>${p.oldprice ? `<span class="product-oldprice">${p.oldprice}$ </span>` : ''}</div>
                 <div class="product-code-badge">رمز: ${p.code || generateTempCode()}</div>
             </div>
         </div>
@@ -125,7 +125,7 @@ function showProductsByCategory(catId) {
                 <img src="${p.image}" class="product-img" onerror="this.src='https://via.placeholder.com/300x500?text=صورة+غير+متوفرة'">
                 <div class="product-info">
                     <div class="product-name">${escapeHtml(p.name)}</div>
-                    <div><span class="product-price">${p.price} $</span>${p.oldprice ? `<span class="product-oldprice">${p.oldprice} $</span>` : ''}</div>
+                    <div><span class="product-price">${p.price}$ </span>${p.oldprice ? `<span class="product-oldprice">${p.oldprice}$ </span>` : ''}</div>
                     <div class="product-code-badge">رمز: ${p.code || generateTempCode()}</div>
                 </div>
             </div>
@@ -157,8 +157,8 @@ function openProductModal(product) {
         <img src="${product.image}" class="product-modal-img" onerror="this.src='https://via.placeholder.com/300x500?text=صورة+غير+متوفرة'">
         <h3 style="color:#5E4B56; margin:0.5rem 0;">${escapeHtml(product.name)}</h3>
         <p style="color:#A89B9F;">${escapeHtml(product.desc || '')}</p>
-        <p style="font-size:1.2rem; font-weight:bold; color:#D58B9A; margin:0.5rem 0;">${product.price} $</p>
-        ${product.oldprice ? `<p style="text-decoration:line-through; color:#A89B9F;">${product.oldprice} $</p>` : ''}
+        <p style="font-size:1.2rem; font-weight:bold; color:#D58B9A; margin:0.5rem 0;">${product.price}$ </p>
+        ${product.oldprice ? `<p style="text-decoration:line-through; color:#A89B9F;">${product.oldprice}$ </p>` : ''}
     `;
     codeSpan.innerText = productCode;
     modal.style.display = 'flex';
@@ -180,7 +180,7 @@ document.getElementById('copyCodeBtn')?.addEventListener('click', () => {
 
 document.getElementById('instagramBuyBtn')?.addEventListener('click', () => {
     if (!currentProduct) return;
-    const instagramUrl = "https://www.instagram.com/roya_store/";
+    const instagramUrl = "https://www.instagram.com/roya_rosse?igsh=MTV4MnU3OXBjZDJxcw==";
     const message = `مرحباً، أريد شراء المنتج التالي:\n\nالمنتج: ${currentProduct.name}\nالسعر: ${currentProduct.price} $\nرمز المنتج: ${currentProduct.code || generateTempCode()}`;
     window.open(`${instagramUrl}?text=${encodeURIComponent(message)}`, '_blank');
 });

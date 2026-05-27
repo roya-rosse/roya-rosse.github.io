@@ -218,7 +218,7 @@
 
     // ===================== إعدادات Cloudinary =====================
     const CLOUDINARY_CLOUD_NAME = "dh6j108wj";
-    const CLOUDINARY_UPLOAD_PRESET = "enath-shop";
+    const CLOUDINARY_UPLOAD_PRESET = "roya-shop";
 
     async function uploadImageToCloudinary(file) {
         const formData = new FormData();
@@ -230,14 +230,11 @@
                 method: "POST",
                 body: formData
             });
-            
             const data = await response.json();
-            
             if (!response.ok) {
                 console.error("Cloudinary error:", data);
                 throw new Error(data.error?.message || "فشل رفع الصورة");
             }
-            
             console.log("Upload success:", data.secure_url);
             return data.secure_url;
         } catch (err) {
@@ -262,14 +259,25 @@
         bindSearchEvent();
     }
 
-    async function saveAll() {
+    async function saveAll(keepSection = null) {
         const adsObj = {}; ads.forEach(a => { adsObj[a.id] = { image: a.image, text: a.text, active: a.active }; });
         await db.ref('ads').set(adsObj);
         const catsObj = {}; categories.forEach(c => { catsObj[c.id] = { name: c.name, image: c.image, active: c.active }; });
         await db.ref('categories').set(catsObj);
         const prodsObj = {}; products.forEach(p => { prodsObj[p.id] = { name: p.name, price: p.price, oldprice: p.oldprice || '', desc: p.desc || '', image: p.image, categoryId: p.categoryId, code: p.code || generateProductCode(), active: p.active }; });
         await db.ref('products').set(prodsObj);
+        
         renderAll();
+        
+        if (keepSection) {
+            const section = document.getElementById(keepSection);
+            if (section) section.classList.add('open');
+            if (keepSection.startsWith('catProducts_')) {
+                const catId = keepSection.replace('catProducts_', '');
+                const catProductsDiv = document.getElementById(`catProducts_${catId}`);
+                if (catProductsDiv) catProductsDiv.classList.add('open');
+            }
+        }
     }
 
     function renderAll() {
@@ -303,8 +311,8 @@
         `).join('');
     }
 
-    window.toggleAd = async (id) => { const ad = ads.find(a => a.id === id); ad.active = !ad.active; await saveAll(); };
-    window.deleteAd = async (id) => { ads = ads.filter(a => a.id !== id); await saveAll(); };
+    window.toggleAd = async (id) => { const ad = ads.find(a => a.id === id); ad.active = !ad.active; await saveAll('adsContent'); };
+    window.deleteAd = async (id) => { ads = ads.filter(a => a.id !== id); await saveAll('adsContent'); };
     window.showEditAd = (id) => { document.getElementById(`editAd_${id}`).style.display = 'block'; };
     window.updateAdImage = async (id) => {
         const file = document.getElementById(`editAdImgFile_${id}`).files[0];
@@ -315,14 +323,14 @@
             const url = await uploadImageToCloudinary(file);
             const ad = ads.find(a => a.id === id);
             ad.image = url;
-            await saveAll();
+            await saveAll('adsContent');
         } catch (err) { alert(err.message); }
         loader.style.display = 'none';
     };
     window.updateAdText = async (id) => {
         const ad = ads.find(a => a.id === id);
         ad.text = document.getElementById(`editAdTxt_${id}`).value;
-        await saveAll();
+        await saveAll('adsContent');
         document.getElementById(`editAd_${id}`).style.display = 'none';
     };
 
@@ -331,13 +339,13 @@
         const text = document.getElementById('newAdText').value;
         if (!file) { alert("اختر صورة للإعلان"); return; }
         const loader = document.getElementById('newAdLoader');
-        loader.style.display = 'flex';
         const btn = document.getElementById('addAdBtn');
+        loader.style.display = 'flex';
         btn.disabled = true;
         try {
             const url = await uploadImageToCloudinary(file);
             ads.push({ id: Date.now().toString(), image: url, text: text || '', active: true });
-            await saveAll();
+            await saveAll('adsContent');
             document.getElementById('newAdImageFile').value = '';
             document.getElementById('newAdText').value = '';
         } catch (err) { alert(err.message); }
@@ -423,24 +431,25 @@
             const url = await uploadImageToCloudinary(file);
             const cat = categories.find(c => c.id === id);
             cat.image = url;
-            await saveAll();
+            await saveAll('categoriesContent');
         } catch (err) { alert(err.message); }
         loader.style.display = 'none';
     };
     window.updateCatName = async (id) => {
         const cat = categories.find(c => c.id === id);
         cat.name = document.getElementById(`editCatName_${id}`).value;
-        await saveAll();
+        await saveAll('categoriesContent');
         document.getElementById(`editCatForm_${id}`).style.display = 'none';
     };
-    window.toggleCategory = async (id) => { const cat = categories.find(c => c.id === id); cat.active = !cat.active; await saveAll(); };
+    window.toggleCategory = async (id) => { const cat = categories.find(c => c.id === id); cat.active = !cat.active; await saveAll('categoriesContent'); };
     window.deleteCategory = async (id) => {
         if (confirm("حذف الفئة سيحذف كل منتجاتها!")) {
             categories = categories.filter(c => c.id !== id);
             products = products.filter(p => p.categoryId !== id);
-            await saveAll();
+            await saveAll('categoriesContent');
         }
     };
+    
     window.addProductToCategory = async (catId) => {
         const name = document.getElementById(`prodName_${catId}`).value.trim();
         const price = document.getElementById(`prodPrice_${catId}`).value.trim();
@@ -462,7 +471,7 @@
                 id: Date.now().toString(), name, price, oldprice, desc, image: imageUrl,
                 categoryId: catId, active: true, code: code
             });
-            await saveAll();
+            await saveAll(`catProducts_${catId}`);
             document.getElementById(`prodName_${catId}`).value = '';
             document.getElementById(`prodPrice_${catId}`).value = '';
             document.getElementById(`prodOld_${catId}`).value = '';
@@ -473,6 +482,7 @@
         loader.style.display = 'none';
         btn.disabled = false;
     };
+    
     window.editProduct = (id) => { document.getElementById(`editForm_${id}`).style.display = 'block'; };
     window.updateProductImage = async (id) => {
         const file = document.getElementById(`editImgFile_${id}`).files[0];
@@ -483,23 +493,29 @@
             const url = await uploadImageToCloudinary(file);
             const prod = products.find(p => p.id === id);
             prod.image = url;
-            await saveAll();
+            await saveAll(`catProducts_${prod.categoryId}`);
         } catch (err) { alert(err.message); }
         loader.style.display = 'none';
     };
     window.updateProductData = async (id) => {
         const prod = products.find(p => p.id === id);
+        const catId = prod.categoryId;
         prod.name = document.getElementById(`editName_${id}`).value;
         prod.price = document.getElementById(`editPrice_${id}`).value;
         prod.oldprice = document.getElementById(`editOld_${id}`).value;
         prod.desc = document.getElementById(`editDesc_${id}`).value;
         let newCode = document.getElementById(`editCode_${id}`).value.trim();
         if (newCode) prod.code = newCode;
-        await saveAll();
+        await saveAll(`catProducts_${catId}`);
         document.getElementById(`editForm_${id}`).style.display = 'none';
     };
-    window.deleteProduct = async (id) => { products = products.filter(p => p.id !== id); await saveAll(); };
-    window.toggleProduct = async (id) => { const prod = products.find(p => p.id === id); prod.active = !prod.active; await saveAll(); };
+    window.deleteProduct = async (id) => {
+        const prod = products.find(p => p.id === id);
+        const catId = prod.categoryId;
+        products = products.filter(p => p.id !== id);
+        await saveAll(`catProducts_${catId}`);
+    };
+    window.toggleProduct = async (id) => { const prod = products.find(p => p.id === id); prod.active = !prod.active; await saveAll(`catProducts_${prod.categoryId}`); };
 
     // إضافة فئة جديدة
     document.getElementById('addCategoryBtn').onclick = async () => {
@@ -513,7 +529,7 @@
         try {
             const imageUrl = await uploadImageToCloudinary(imageFile);
             categories.push({ id: Date.now().toString(), name, image: imageUrl, active: true });
-            await saveAll();
+            await saveAll('categoriesContent');
             document.getElementById('newCatName').value = '';
             document.getElementById('newCatImageFile').value = '';
         } catch (err) { alert(err.message); }
@@ -570,19 +586,20 @@
             const url = await uploadImageToCloudinary(file);
             const prod = products.find(p => p.id === id);
             prod.image = url;
-            await saveAll();
+            await saveAll(`catProducts_${prod.categoryId}`);
         } catch (err) { alert(err.message); }
         loader.style.display = 'none';
     };
     window.updateGlobalProductData = async (id) => {
         const prod = products.find(p => p.id === id);
+        const catId = prod.categoryId;
         prod.name = document.getElementById(`gName_${id}`).value;
         prod.price = document.getElementById(`gPrice_${id}`).value;
         prod.oldprice = document.getElementById(`gOld_${id}`).value;
         prod.desc = document.getElementById(`gDesc_${id}`).value;
         let newCode = document.getElementById(`gCode_${id}`).value.trim();
         if (newCode) prod.code = newCode;
-        await saveAll();
+        await saveAll(`catProducts_${catId}`);
         document.getElementById(`globalEdit_${id}`).style.display = 'none';
     };
 

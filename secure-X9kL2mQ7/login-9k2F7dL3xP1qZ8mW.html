@@ -2,33 +2,113 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="robots" content="noindex, nofollow">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>دخول الأدمن - إناث</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>دخول الأدمن - رويـا</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Tajawal', sans-serif; }
-        body { background: #f4f1ea; display: flex; justify-content: center; align-items: center; height: 100vh; direction: rtl; }
-        .login-box { background: white; padding: 2rem; border-radius: 30px; width: 90%; max-width: 350px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-        .login-box h2 { color: #b5838d; margin-bottom: 1rem; }
-        .input-group { margin-bottom: 1rem; }
-        input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 25px; }
-        button { width: 100%; padding: 12px; background: #b5838d; color: white; border: none; border-radius: 25px; cursor: pointer; }
-        .error { color: #e5989b; margin-top: 10px; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Tajawal', sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #FFF5F7 0%, #FFE4E8 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            direction: rtl;
+            padding: 1rem;
+        }
+        .login-box {
+            background: white;
+            border-radius: 40px;
+            padding: 2rem 1.5rem;
+            width: 100%;
+            max-width: 380px;
+            text-align: center;
+            box-shadow: 0 20px 35px rgba(0,0,0,0.05);
+        }
+        .login-box h2 {
+            color: #FF9AAE;
+            margin-bottom: 0.5rem;
+            font-size: 1.8rem;
+        }
+        .login-box p {
+            color: #A89B9F;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+        .input-group {
+            margin-bottom: 1.2rem;
+            text-align: right;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #FFE4E8;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-family: 'Tajawal', sans-serif;
+            transition: 0.3s;
+            background: #FEFEFE;
+        }
+        .input-group input:focus {
+            outline: none;
+            border-color: #FF9AAE;
+            box-shadow: 0 0 0 2px rgba(255,154,174,0.2);
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #FF9AAE;
+            color: #5E4B56;
+            border: none;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        button:hover {
+            background: #FFB3C6;
+            transform: translateY(-2px);
+        }
+        .error-message {
+            color: #D58B9A;
+            font-size: 0.8rem;
+            margin-top: 0.8rem;
+            padding: 0.5rem;
+            background: #FFF0F3;
+            border-radius: 20px;
+            display: none;
+        }
+        .footer-note {
+            margin-top: 1.5rem;
+            font-size: 0.7rem;
+            color: #A89B9F;
+        }
+        .footer-note strong {
+            color: #FF9AAE;
+        }
     </style>
 </head>
 <body>
 <div class="login-box">
-    <h2>🔐 دخول الأدمن</h2>
+    <h2>🔐 رويـا</h2>
+    <p>لوحة تحكم الأدمن</p>
+
     <div class="input-group">
-        <input type="email" id="loginEmail" placeholder="البريد الإلكتروني">
+        <input type="email" id="loginEmail" placeholder="البريد الإلكتروني" autocomplete="off">
     </div>
     <div class="input-group">
-        <input type="password" id="loginPassword" placeholder="كلمة المرور">
+        <input type="password" id="loginPassword" placeholder="كلمة المرور" autocomplete="off">
     </div>
+
     <button id="loginButton">دخول</button>
-    <div id="errorMsg" class="error"></div>
-    <div style="margin-top: 1.5rem; text-align: center; font-size: 0.75rem; color: #aaa;">
-        تصميم وتطوير: <strong>Ahmad Kllawe</strong>
+    <div id="errorMsg" class="error-message"></div>
+    <div class="footer-note">
+        تصميم وتطوير: <strong>Ahmad Kllawe</strong> © 2025
     </div>
 </div>
 
@@ -44,13 +124,13 @@
         messagingSenderId: "101026768739",
         appId: "1:101026768739:web:c3635b04e972914a5b1556"
     };
+
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
 
-    // ضبط الجلسة لتنتهي عند إغلاق المتصفح
+    // ضبط الجلسة
     auth.setPersistence(firebase.auth.Auth.Persistence.SESSION)
-        .then(() => console.log("جلسة SESSION مفعلة"))
-        .catch((error) => console.error("خطأ في تعيين الجلسة:", error));
+        .catch(err => console.error(err));
 
     const loginBtn = document.getElementById('loginButton');
     const emailInput = document.getElementById('loginEmail');
@@ -62,17 +142,33 @@
         const password = passInput.value;
         if (!email || !password) {
             errorDiv.innerText = 'الرجاء إدخال البريد الإلكتروني وكلمة المرور';
+            errorDiv.style.display = 'block';
             return;
         }
         try {
             await auth.signInWithEmailAndPassword(email, password);
+            // التوجيه يتم عبر onAuthStateChanged
         } catch (err) {
             console.error(err);
             let msg = 'بيانات الدخول غير صحيحة';
-            if (err.code === 'auth/user-not-found') msg = '❌ لا يوجد حساب بهذا البريد';
-            else if (err.code === 'auth/wrong-password') msg = '❌ كلمة المرور غير صحيحة';
-            else if (err.code === 'auth/invalid-email') msg = '❌ البريد الإلكتروني غير صالح';
+            switch (err.code) {
+                case 'auth/user-not-found':
+                    msg = '❌ لا يوجد حساب بهذا البريد الإلكتروني';
+                    break;
+                case 'auth/wrong-password':
+                    msg = '❌ كلمة المرور غير صحيحة';
+                    break;
+                case 'auth/invalid-email':
+                    msg = '❌ البريد الإلكتروني غير صالح';
+                    break;
+                case 'auth/too-many-requests':
+                    msg = '❌ تم تعطيل الحساب مؤقتاً بسبب كثرة المحاولات الفاشلة. حاول لاحقاً.';
+                    break;
+                default:
+                    msg = '❌ خطأ في تسجيل الدخول: ' + err.message;
+            }
             errorDiv.innerText = msg;
+            errorDiv.style.display = 'block';
         }
     };
 

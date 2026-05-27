@@ -3,6 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    
+    <!-- ========== التحديث التلقائي ========== -->
+    <script>
+        (function() {
+            const CURRENT_VERSION = "2.5"; // 🔄 غيّر هذا الرقم كلما عدلت الملف
+            const storedVersion = localStorage.getItem('admin_version');
+            if (storedVersion !== CURRENT_VERSION) {
+                localStorage.setItem('admin_version', CURRENT_VERSION);
+                window.location.reload(true);
+            }
+        })();
+    </script>
+    
+    <!-- منع التخزين المؤقت -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    
     <title>لوحة الأدمن - رويـا</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -97,45 +115,92 @@
         .category-products-area { margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed #FFE4E8; display: none; }
         .category-products-area.open { display: block; }
         
+        /* ========== تحسين الأزرار ========== */
         .btn {
-            background: #FF9AAE;
+            background: linear-gradient(135deg, #FF9AAE, #FFB3C6);
             color: #5E4B56;
             border: none;
-            padding: 8px 18px;
-            border-radius: 40px;
+            padding: 10px 20px;
+            border-radius: 50px;
             cursor: pointer;
             font-weight: bold;
-            transition: 0.2s;
+            transition: all 0.3s ease;
             font-size: 0.85rem;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
-        .btn:hover { background: #FFB3C6; transform: translateY(-1px); }
-        .btn-danger { background: #D58B9A; color: white; }
-        .btn-danger:hover { background: #c47a8a; }
-        .btn-success { background: #C7CEEA; color: #5E4B56; }
-        .btn-success:hover { background: #b8c0e0; }
-        .btn-sm { padding: 5px 12px; font-size: 0.75rem; }
-        
-        .file-upload { position: relative; display: inline-block; width: 100%; }
-        .file-upload-btn {
-            background: #E8E8E8;
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255,154,174,0.3);
+            background: linear-gradient(135deg, #FFB3C6, #FFC9D8);
+        }
+        .btn:active {
+            transform: translateY(0);
+        }
+        .btn-danger {
+            background: linear-gradient(135deg, #D58B9A, #E09DAE);
+            color: white;
+        }
+        .btn-danger:hover {
+            background: linear-gradient(135deg, #E09DAE, #E8B0BF);
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #C7CEEA, #D5DBF2);
             color: #5E4B56;
-            padding: 10px 16px;
-            border-radius: 40px;
+        }
+        .btn-success:hover {
+            background: linear-gradient(135deg, #D5DBF2, #E3E8F8);
+        }
+        .btn-sm {
+            padding: 6px 14px;
+            font-size: 0.75rem;
+        }
+        
+        /* ========== تحسين زر رفع الصور ========== */
+        .file-upload {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+        .file-upload-btn {
+            background: linear-gradient(135deg, #E8E8E8, #F0F0F0);
+            color: #5E4B56;
+            padding: 12px 20px;
+            border-radius: 50px;
             cursor: pointer;
             font-size: 0.85rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            transition: 0.2s;
+            gap: 10px;
+            transition: all 0.3s ease;
             border: 1px solid #FFE4E8;
+            font-weight: bold;
         }
-        .file-upload-btn:hover { background: #FFE4E8; }
-        .file-upload input[type="file"] { position: absolute; top: 0; right: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
-        .file-name { font-size: 0.7rem; color: #A89B9F; margin-top: 4px; display: block; }
+        .file-upload-btn:hover {
+            background: linear-gradient(135deg, #FFE4E8, #FFF0F3);
+            border-color: #FF9AAE;
+            transform: translateY(-1px);
+        }
+        .file-upload input[type="file"] {
+            position: absolute;
+            top: 0;
+            right: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        .file-name {
+            font-size: 0.7rem;
+            color: #A89B9F;
+            margin-top: 6px;
+            display: block;
+            text-align: center;
+        }
         
         input, textarea, select {
             width: 100%;
@@ -171,7 +236,21 @@
         .search-in-products i { color: #FF9AAE; margin-left: 10px; }
         .search-in-products input { border: none; background: transparent; margin: 0; padding: 10px 0; }
         
-        .logout-btn { background: #D58B9A; color: white; margin-bottom: 0.5rem; padding: 6px 18px; font-size: 0.85rem; border-radius: 40px; }
+        .logout-btn { 
+            background: linear-gradient(135deg, #D58B9A, #E09DAE);
+            color: white; 
+            margin-bottom: 0.5rem; 
+            padding: 6px 18px; 
+            font-size: 0.85rem; 
+            border-radius: 40px;
+            border: none;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .logout-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(213,139,154,0.3);
+        }
         .footer-credit {
             margin-top: 2rem;
             text-align: center;
@@ -218,6 +297,7 @@
         <button id="logoutBtn" class="logout-btn"><i class="fas fa-sign-out-alt"></i> خروج</button>
     </div>
 
+    <!-- قسم الإعلانات -->
     <div class="section">
         <div class="section-header" onclick="toggleSection('adsContent')">
             <span><i class="fas fa-ad"></i> إدارة الإعلانات</span>
@@ -228,17 +308,20 @@
             <div class="add-product-form">
                 <h4>➕ إضافة إعلان جديد</h4>
                 <div class="file-upload mb-1">
-                    <div class="file-upload-btn"><i class="fas fa-cloud-upload-alt"></i> اختر صورة</div>
+                    <div class="file-upload-btn">
+                        <i class="fas fa-cloud-upload-alt"></i> اختر صورة للإعلان
+                    </div>
                     <input type="file" id="newAdImageFile" accept="image/*">
-                    <span class="file-name" id="newAdFileName">لم يتم اختيار ملف</span>
+                    <span class="file-name" id="newAdFileName">📁 لم يتم اختيار ملف</span>
                 </div>
                 <input type="text" id="newAdText" placeholder="نص الإعلان (اختياري)">
-                <button id="addAdBtn" class="btn mt-2">إضافة إعلان</button>
+                <button id="addAdBtn" class="btn mt-2"><i class="fas fa-plus"></i> إضافة إعلان</button>
                 <div id="newAdLoader" style="display:none; margin-top:8px;"><span class="loader-small"></span> جاري رفع الصورة...</div>
             </div>
         </div>
     </div>
 
+    <!-- قسم الفئات والمنتجات -->
     <div class="section">
         <div class="section-header" onclick="toggleSection('categoriesContent')">
             <span><i class="fas fa-th-large"></i> إدارة الفئات والمنتجات</span>
@@ -250,16 +333,19 @@
                 <h4>➕ إضافة فئة جديدة</h4>
                 <input type="text" id="newCatName" placeholder="اسم الفئة">
                 <div class="file-upload mb-1">
-                    <div class="file-upload-btn"><i class="fas fa-cloud-upload-alt"></i> اختر صورة الفئة</div>
+                    <div class="file-upload-btn">
+                        <i class="fas fa-cloud-upload-alt"></i> اختر صورة الفئة
+                    </div>
                     <input type="file" id="newCatImageFile" accept="image/*">
-                    <span class="file-name" id="newCatFileName">لم يتم اختيار ملف</span>
+                    <span class="file-name" id="newCatFileName">📁 لم يتم اختيار ملف</span>
                 </div>
-                <button id="addCategoryBtn" class="btn">إضافة فئة</button>
+                <button id="addCategoryBtn" class="btn"><i class="fas fa-plus"></i> إضافة فئة</button>
                 <div id="newCatLoader" style="display:none; margin-top:8px;"><span class="loader-small"></span> جاري رفع الصورة...</div>
             </div>
         </div>
     </div>
 
+    <!-- قسم جميع المنتجات -->
     <div class="section">
         <div class="section-header" onclick="toggleSection('allProductsContent')">
             <span><i class="fas fa-boxes"></i> جميع المنتجات</span>
@@ -304,7 +390,7 @@
     const CLOUDINARY_CLOUD_NAME = "dh6j108wj";
     const CLOUDINARY_UPLOAD_PRESET = "roya-shop";
 
-    // ===================== دالة ضغط الصورة =====================
+    // دالة ضغط الصورة
     async function compressImage(file) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -316,11 +402,8 @@
                     const canvas = document.createElement('canvas');
                     let width = img.width;
                     let height = img.height;
-                    
-                    // الحد الأقصى للأبعاد (يحافظ على النسبة)
                     const maxWidth = 1200;
                     const maxHeight = 1200;
-                    
                     if (width > height) {
                         if (width > maxWidth) {
                             height = (height * maxWidth) / width;
@@ -332,15 +415,12 @@
                             height = maxHeight;
                         }
                     }
-                    
                     canvas.width = width;
                     canvas.height = height;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
-                    
-                    // ضغط الصورة إلى JPEG بجودة 75%
                     canvas.toBlob((blob) => {
-                        console.log(`📦 ضغط الصورة: ${(file.size / 1024).toFixed(1)}KB → ${(blob.size / 1024).toFixed(1)}KB (توفير ${((1 - blob.size / file.size) * 100).toFixed(1)}%)`);
+                        console.log(`📦 ضغط الصورة: ${(file.size / 1024).toFixed(1)}KB → ${(blob.size / 1024).toFixed(1)}KB`);
                         resolve(blob);
                     }, 'image/jpeg', 0.75);
                 };
@@ -350,16 +430,13 @@
         });
     }
 
-    // ===================== دالة رفع الصورة مع الضغط المسبق =====================
+    // دالة رفع الصورة مع ضغط
     async function uploadImageToCloudinary(file) {
         try {
-            // ضغط الصورة أولاً
             const compressedBlob = await compressImage(file);
-            
             const formData = new FormData();
             formData.append("file", compressedBlob, file.name.replace(/\.[^/.]+$/, '.jpg'));
             formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
-            
             const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/upload`, {
                 method: "POST",
                 body: formData
@@ -419,19 +496,23 @@
                 <div class="flex-between"><img src="${ad.image}" width="50" style="border-radius:12px;"><span class="badge ${ad.active ? 'badge-active' : 'badge-inactive'}">${ad.active ? 'نشط' : 'مخفي'}</span></div>
                 <p class="mt-2">${ad.text || ''}</p>
                 <div class="flex-start mt-2">
-                    <button class="btn btn-sm" onclick="toggleAd('${ad.id}')">${ad.active ? 'إخفاء' : 'إظهار'}</button>
-                    <button class="btn btn-sm btn-danger" onclick="deleteAd('${ad.id}')">حذف</button>
-                    <button class="btn btn-sm btn-success" onclick="showEditAd('${ad.id}')">تعديل</button>
+                    <button class="btn btn-sm" onclick="toggleAd('${ad.id}')"><i class="fas fa-eye${ad.active ? '-slash' : ''}"></i> ${ad.active ? 'إخفاء' : 'إظهار'}</button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteAd('${ad.id}')"><i class="fas fa-trash"></i> حذف</button>
+                    <button class="btn btn-sm btn-success" onclick="showEditAd('${ad.id}')"><i class="fas fa-edit"></i> تعديل</button>
                 </div>
                 <div id="editAd_${ad.id}" style="display:none; margin-top:12px;">
-                    <div class="file-upload mb-1"><div class="file-upload-btn"><i class="fas fa-cloud-upload-alt"></i> تحديث الصورة</div><input type="file" id="editAdImgFile_${ad.id}" accept="image/*"><span class="file-name" id="editAdFileName_${ad.id}">اختر ملف جديد</span></div>
+                    <div class="file-upload mb-1">
+                        <div class="file-upload-btn"><i class="fas fa-cloud-upload-alt"></i> تحديث الصورة</div>
+                        <input type="file" id="editAdImgFile_${ad.id}" accept="image/*">
+                        <span class="file-name" id="editAdFileName_${ad.id}">📁 اختر ملف جديد</span>
+                    </div>
                     <input type="text" id="editAdTxt_${ad.id}" value="${ad.text || ''}" placeholder="نص الإعلان">
                     <div class="flex-start mt-2"><button class="btn btn-sm btn-success" onclick="updateAdImage('${ad.id}')">حفظ الصورة</button><button class="btn btn-sm btn-success" onclick="updateAdText('${ad.id}')">حفظ النص</button></div>
                     <div id="editAdLoader_${ad.id}" style="display:none;"><span class="loader-small"></span> جاري...</div>
                 </div>
             </div>
         `).join('');
-        ads.forEach(ad => { const fi = document.getElementById(`editAdImgFile_${ad.id}`); if(fi) fi.onchange = (e) => { document.getElementById(`editAdFileName_${ad.id}`).innerText = e.target.files[0]?.name || 'اختر ملف جديد'; }; });
+        ads.forEach(ad => { const fi = document.getElementById(`editAdImgFile_${ad.id}`); if(fi) fi.onchange = (e) => { document.getElementById(`editAdFileName_${ad.id}`).innerText = e.target.files[0]?.name || '📁 اختر ملف جديد'; }; });
     }
 
     window.toggleAd = async (id) => { const ad = ads.find(a => a.id === id); ad.active = !ad.active; await saveAll('adsContent'); showToast(ad.active ? "✅ تم إظهار الإعلان" : "✅ تم إخفاء الإعلان"); };
@@ -474,14 +555,15 @@
             await saveAll('adsContent');
             document.getElementById('newAdImageFile').value = '';
             document.getElementById('newAdText').value = '';
-            document.getElementById('newAdFileName').innerText = 'لم يتم اختيار ملف';
+            document.getElementById('newAdFileName').innerText = '📁 لم يتم اختيار ملف';
             showToast("✅ تم إضافة الإعلان بنجاح");
         } catch (err) { showToast("❌ خطأ: " + err.message, true); }
         loader.style.display = 'none';
         btn.disabled = false;
     };
-    document.getElementById('newAdImageFile').onchange = (e) => { document.getElementById('newAdFileName').innerText = e.target.files[0]?.name || 'لم يتم اختيار ملف'; };
+    document.getElementById('newAdImageFile').onchange = (e) => { document.getElementById('newAdFileName').innerText = e.target.files[0]?.name || '📁 تم اختيار ملف'; };
 
+    // دالة عرض الفئات (كما هي مع أزرار محسنة)
     function renderCategories() {
         const container = document.getElementById('categoriesList');
         container.innerHTML = categories.map(cat => `
@@ -489,17 +571,20 @@
                 <div class="category-header">
                     <div class="category-info"><img src="${cat.image}"><h3>${escapeHtml(cat.name)}</h3><span class="badge ${cat.active ? 'badge-active' : 'badge-inactive'}">${cat.active ? 'نشط' : 'مخفي'}</span></div>
                     <div class="category-buttons">
-                        <button class="btn btn-sm" onclick="openEditCategoryForm('${cat.id}')">✏️ تعديل</button>
-                        <button class="btn btn-sm" onclick="toggleCategory('${cat.id}')">👁️ ${cat.active ? 'إخفاء' : 'إظهار'}</button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteCategory('${cat.id}')">🗑️ حذف</button>
+                        <button class="btn btn-sm" onclick="openEditCategoryForm('${cat.id}')"><i class="fas fa-edit"></i> تعديل</button>
+                        <button class="btn btn-sm" onclick="toggleCategory('${cat.id}')"><i class="fas fa-eye${cat.active ? '-slash' : ''}"></i> ${cat.active ? 'إخفاء' : 'إظهار'}</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteCategory('${cat.id}')"><i class="fas fa-trash"></i> حذف</button>
                     </div>
                 </div>
                 <div id="editCatForm_${cat.id}" class="edit-category-form">
                     <div class="flex-start" style="gap:8px;">
                         <input type="text" id="editCatName_${cat.id}" value="${cat.name}" placeholder="اسم الفئة" style="flex:2;">
-                        <input type="file" id="editCatImgFile_${cat.id}" accept="image/*" style="flex:1;">
-                        <button class="btn btn-sm btn-success" onclick="updateCategory('${cat.id}')">حفظ</button>
-                        <button class="btn btn-sm" onclick="closeEditCategoryForm('${cat.id}')">إلغاء</button>
+                        <div class="file-upload" style="flex:1; margin:0;">
+                            <div class="file-upload-btn" style="padding:8px;"><i class="fas fa-cloud-upload-alt"></i> صورة</div>
+                            <input type="file" id="editCatImgFile_${cat.id}" accept="image/*">
+                        </div>
+                        <button class="btn btn-sm btn-success" onclick="updateCategory('${cat.id}')"><i class="fas fa-save"></i> حفظ</button>
+                        <button class="btn btn-sm" onclick="closeEditCategoryForm('${cat.id}')"><i class="fas fa-times"></i> إلغاء</button>
                     </div>
                     <span class="file-name" id="editCatFileName_${cat.id}">اختر صورة جديدة (اختياري)</span>
                     <div id="editCatLoader_${cat.id}" style="display:none;"><span class="loader-small"></span> جاري...</div>
@@ -510,18 +595,22 @@
                         <h4>➕ إضافة منتج جديد لهذه الفئة</h4>
                         <input type="text" id="prodName_${cat.id}" placeholder="اسم المنتج">
                         <input type="text" id="prodPrice_${cat.id}" placeholder="السعر $">
-                        <input type="text" id="prodOld_${cat.id}" placeholder="السعر قبل الخصم (اختياري)">
+                        <input type="text" id="prodOld_${cat.id}" placeholder="السعر قبل الخصم">
                         <textarea id="prodDesc_${cat.id}" rows="2" placeholder="الوصف"></textarea>
-                        <div class="file-upload mb-1"><div class="file-upload-btn"><i class="fas fa-cloud-upload-alt"></i> اختر صورة المنتج</div><input type="file" id="prodImgFile_${cat.id}" accept="image/*"><span class="file-name" id="prodFileName_${cat.id}">لم يتم اختيار ملف</span></div>
+                        <div class="file-upload mb-1">
+                            <div class="file-upload-btn"><i class="fas fa-cloud-upload-alt"></i> اختر صورة المنتج</div>
+                            <input type="file" id="prodImgFile_${cat.id}" accept="image/*">
+                            <span class="file-name" id="prodFileName_${cat.id}">📁 لم يتم اختيار ملف</span>
+                        </div>
                         <input type="text" id="prodCode_${cat.id}" placeholder="رمز المنتج (سيُولد تلقائياً)">
-                        <button class="btn" onclick="addProductToCategory('${cat.id}')">➕ إضافة المنتج</button>
+                        <button class="btn" onclick="addProductToCategory('${cat.id}')"><i class="fas fa-plus"></i> إضافة المنتج</button>
                         <div id="uploadLoader_${cat.id}" style="display:none;"><span class="loader-small"></span> جاري رفع الصورة...</div>
                     </div>
                     <h4 style="margin: 1rem 0 0.5rem;">📦 منتجات هذه الفئة:</h4>
                     <div id="prodsList_${cat.id}">${products.filter(p => p.categoryId === cat.id && p.active).map(p => `
                         <div class="product-item" id="product_${p.id}">
                             <div class="flex-between"><div class="flex-start"><img src="${p.image}" width="35" style="border-radius:8px;"><strong>${escapeHtml(p.name)}</strong> - ${p.price} $</div><span class="badge ${p.active ? 'badge-active' : 'badge-inactive'}">${p.active ? 'نشط' : 'مخفي'}</span></div>
-                            <div class="flex-start mt-2"><button class="btn btn-sm" onclick="editProduct('${p.id}')">✏️ تعديل</button><button class="btn btn-sm" onclick="toggleProduct('${p.id}')">👁️ ${p.active ? 'إخفاء' : 'إظهار'}</button><button class="btn btn-sm btn-danger" onclick="deleteProduct('${p.id}')">🗑️ حذف</button></div>
+                            <div class="flex-start mt-2"><button class="btn btn-sm" onclick="editProduct('${p.id}')"><i class="fas fa-edit"></i> تعديل</button><button class="btn btn-sm" onclick="toggleProduct('${p.id}')"><i class="fas fa-eye${p.active ? '-slash' : ''}"></i> ${p.active ? 'إخفاء' : 'إظهار'}</button><button class="btn btn-sm btn-danger" onclick="deleteProduct('${p.id}')"><i class="fas fa-trash"></i> حذف</button></div>
                             <div id="editForm_${p.id}" style="display:none; margin-top:12px; background:#FFF5F7; padding:12px; border-radius:18px;">
                                 <div class="file-upload mb-1"><div class="file-upload-btn"><i class="fas fa-cloud-upload-alt"></i> تحديث الصورة</div><input type="file" id="editImgFile_${p.id}" accept="image/*"><span class="file-name" id="editFileName_${p.id}">اختر ملف جديد</span></div>
                                 <input type="text" id="editName_${p.id}" value="${p.name}"><input type="text" id="editPrice_${p.id}" value="${p.price}"><input type="text" id="editOld_${p.id}" value="${p.oldprice || ''}"><textarea id="editDesc_${p.id}" rows="2">${p.desc || ''}</textarea><input type="text" id="editCode_${p.id}" value="${p.code || ''}" placeholder="رمز المنتج">
@@ -536,9 +625,9 @@
         
         categories.forEach(cat => {
             const fi = document.getElementById(`prodImgFile_${cat.id}`);
-            if(fi) fi.onchange = (e) => { document.getElementById(`prodFileName_${cat.id}`).innerText = e.target.files[0]?.name || 'لم يتم اختيار ملف'; };
+            if(fi) fi.onchange = (e) => { document.getElementById(`prodFileName_${cat.id}`).innerText = e.target.files[0]?.name || '📁 تم اختيار ملف'; };
             const editFi = document.getElementById(`editCatImgFile_${cat.id}`);
-            if(editFi) editFi.onchange = (e) => { document.getElementById(`editCatFileName_${cat.id}`).innerText = e.target.files[0]?.name || 'اختر صورة جديدة'; };
+            if(editFi) editFi.onchange = (e) => { document.getElementById(`editCatFileName_${cat.id}`).innerText = e.target.files[0]?.name || '📁 تم اختيار ملف'; };
         });
     }
 
@@ -575,7 +664,7 @@
         else { area.classList.add('open'); icon.style.transform = 'rotate(180deg)'; }
     };
 
-    // ===================== إضافة منتج مع ضغط الصورة =====================
+    // إضافة منتج
     window.addProductToCategory = async (catId) => {
         const name = document.getElementById(`prodName_${catId}`).value.trim();
         const price = document.getElementById(`prodPrice_${catId}`).value.trim();
@@ -599,23 +688,21 @@
             };
             products.push(newProduct);
             await saveAll('categoriesContent');
-            
             showToast("✅ تمت إضافة المنتج بنجاح (تم ضغط الصورة)", false);
-            
             document.getElementById(`prodName_${catId}`).value = '';
             document.getElementById(`prodPrice_${catId}`).value = '';
             document.getElementById(`prodOld_${catId}`).value = '';
             document.getElementById(`prodDesc_${catId}`).value = '';
             document.getElementById(`prodImgFile_${catId}`).value = '';
             document.getElementById(`prodCode_${catId}`).value = '';
-            document.getElementById(`prodFileName_${catId}`).innerText = 'لم يتم اختيار ملف';
+            document.getElementById(`prodFileName_${catId}`).innerText = '📁 لم يتم اختيار ملف';
             
             const prodsContainer = document.getElementById(`prodsList_${catId}`);
             const catProducts = products.filter(p => p.categoryId === catId && p.active);
             prodsContainer.innerHTML = catProducts.map(p => `
                 <div class="product-item" id="product_${p.id}">
                     <div class="flex-between"><div class="flex-start"><img src="${p.image}" width="35" style="border-radius:8px;"><strong>${escapeHtml(p.name)}</strong> - ${p.price} $</div><span class="badge ${p.active ? 'badge-active' : 'badge-inactive'}">${p.active ? 'نشط' : 'مخفي'}</span></div>
-                    <div class="flex-start mt-2"><button class="btn btn-sm" onclick="editProduct('${p.id}')">✏️ تعديل</button><button class="btn btn-sm" onclick="toggleProduct('${p.id}')">👁️ ${p.active ? 'إخفاء' : 'إظهار'}</button><button class="btn btn-sm btn-danger" onclick="deleteProduct('${p.id}')">🗑️ حذف</button></div>
+                    <div class="flex-start mt-2"><button class="btn btn-sm" onclick="editProduct('${p.id}')"><i class="fas fa-edit"></i> تعديل</button><button class="btn btn-sm" onclick="toggleProduct('${p.id}')"><i class="fas fa-eye${p.active ? '-slash' : ''}"></i> ${p.active ? 'إخفاء' : 'إظهار'}</button><button class="btn btn-sm btn-danger" onclick="deleteProduct('${p.id}')"><i class="fas fa-trash"></i> حذف</button></div>
                     <div id="editForm_${p.id}" style="display:none; margin-top:12px; background:#FFF5F7; padding:12px; border-radius:18px;">
                         <div class="file-upload mb-1"><div class="file-upload-btn"><i class="fas fa-cloud-upload-alt"></i> تحديث الصورة</div><input type="file" id="editImgFile_${p.id}" accept="image/*"><span class="file-name" id="editFileName_${p.id}">اختر ملف جديد</span></div>
                         <input type="text" id="editName_${p.id}" value="${p.name}"><input type="text" id="editPrice_${p.id}" value="${p.price}"><input type="text" id="editOld_${p.id}" value="${p.oldprice || ''}"><textarea id="editDesc_${p.id}" rows="2">${p.desc || ''}</textarea><input type="text" id="editCode_${p.id}" value="${p.code || ''}" placeholder="رمز المنتج">
@@ -624,12 +711,10 @@
                     </div>
                 </div>
             `).join('');
-            
             catProducts.forEach(p => {
                 const fi = document.getElementById(`editImgFile_${p.id}`);
                 if (fi) fi.onchange = (e) => { document.getElementById(`editFileName_${p.id}`).innerText = e.target.files[0]?.name || 'اختر ملف جديد'; };
             });
-            
         } catch (err) { showToast("❌ خطأ في رفع الصورة: " + err.message, true); }
         loader.style.display = 'none';
         btn.disabled = false;
@@ -680,13 +765,13 @@
             await saveAll('categoriesContent');
             document.getElementById('newCatName').value = '';
             document.getElementById('newCatImageFile').value = '';
-            document.getElementById('newCatFileName').innerText = 'لم يتم اختيار ملف';
+            document.getElementById('newCatFileName').innerText = '📁 لم يتم اختيار ملف';
             showToast("✅ تم إضافة الفئة بنجاح (تم ضغط الصورة)");
         } catch (err) { showToast("❌ خطأ: " + err.message, true); }
         loader.style.display = 'none';
         btn.disabled = false;
     };
-    document.getElementById('newCatImageFile').onchange = (e) => { document.getElementById('newCatFileName').innerText = e.target.files[0]?.name || 'لم يتم اختيار ملف'; };
+    document.getElementById('newCatImageFile').onchange = (e) => { document.getElementById('newCatFileName').innerText = e.target.files[0]?.name || '📁 تم اختيار ملف'; };
 
     function renderFilteredProducts(searchText) {
         const container = document.getElementById('productsList');
@@ -700,7 +785,7 @@
             <div class="card" style="margin-bottom:1rem; padding:1rem; border:1px solid #FFE4E8; border-radius:20px;">
                 <div class="flex-between"><div class="flex-start"><img src="${p.image}" width="40" style="border-radius:10px;"><strong>${escapeHtml(p.name)}</strong> - ${p.price} $</div><span class="badge ${p.active ? 'badge-active' : 'badge-inactive'}">${p.active ? 'نشط' : 'مخفي'}</span></div>
                 <div class="mt-1">الفئة: ${catsMap[p.categoryId] || 'غير محدد'}</div><div>الرمز: ${p.code || 'غير محدد'}</div>
-                <div class="flex-start mt-2"><button class="btn btn-sm" onclick="editGlobalProduct('${p.id}')">✏️ تعديل</button><button class="btn btn-sm" onclick="toggleProduct('${p.id}')">👁️ ${p.active ? 'إخفاء' : 'إظهار'}</button><button class="btn btn-sm btn-danger" onclick="deleteProduct('${p.id}')">🗑️ حذف</button></div>
+                <div class="flex-start mt-2"><button class="btn btn-sm" onclick="editGlobalProduct('${p.id}')"><i class="fas fa-edit"></i> تعديل</button><button class="btn btn-sm" onclick="toggleProduct('${p.id}')"><i class="fas fa-eye${p.active ? '-slash' : ''}"></i> ${p.active ? 'إخفاء' : 'إظهار'}</button><button class="btn btn-sm btn-danger" onclick="deleteProduct('${p.id}')"><i class="fas fa-trash"></i> حذف</button></div>
                 <div id="globalEdit_${p.id}" style="display:none; margin-top:12px; background:#FFF5F7; padding:12px; border-radius:18px;">
                     <div class="file-upload mb-1"><div class="file-upload-btn"><i class="fas fa-cloud-upload-alt"></i> تحديث الصورة</div><input type="file" id="globalEditImgFile_${p.id}" accept="image/*"><span class="file-name" id="globalEditFileName_${p.id}">اختر ملف جديد</span></div>
                     <input type="text" id="gName_${p.id}" value="${p.name}"><input type="text" id="gPrice_${p.id}" value="${p.price}"><input type="text" id="gOld_${p.id}" value="${p.oldprice || ''}"><textarea id="gDesc_${p.id}" rows="2">${p.desc || ''}</textarea><input type="text" id="gCode_${p.id}" value="${p.code || ''}">

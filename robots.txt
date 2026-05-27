@@ -1,2 +1,9 @@
 User-agent: *
-Disallow: /_secure_X9kL2mQ7/
+Allow: /
+
+Disallow: /admin-9k2F7dL3xP1qZ8mW.html
+Disallow: /login-9k2F7dL3xP1qZ8mW.html
+Disallow: /img/
+Disallow: /js/
+
+Sitemap: https://roya-rosse.github.io/sitemap.xml

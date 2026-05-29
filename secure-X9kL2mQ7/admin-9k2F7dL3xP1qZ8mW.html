@@ -431,25 +431,53 @@
     }
 
     // دالة رفع الصورة مع ضغط
-    async function uploadImageToCloudinary(file) {
-        try {
-            const compressedBlob = await compressImage(file);
-            const formData = new FormData();
-            formData.append("file", compressedBlob, file.name.replace(/\.[^/.]+$/, '.jpg'));
-            formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
-            const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/upload`, {
-                method: "POST",
-                body: formData
-            });
-            const data = await response.json();
-            if (!response.ok) throw new Error(data.error?.message || "فشل رفع الصورة");
-            return data.secure_url;
-        } catch (err) {
-            console.error("Upload error:", err);
-            throw err;
-        }
-    }
+    // async function uploadImageToCloudinary(file) {
+    //     try {
+    //         const compressedBlob = await compressImage(file);
+    //         const formData = new FormData();
+    //         formData.append("file", compressedBlob, file.name.replace(/\.[^/.]+$/, '.jpg'));
+    //         formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+    //         const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/upload`, {
+    //             method: "POST",
+    //             body: formData
+    //         });
+    //         const data = await response.json();
+    //         if (!response.ok) throw new Error(data.error?.message || "فشل رفع الصورة");
+    //         return data.secure_url;
+    //     } catch (err) {
+    //         console.error("Upload error:", err);
+    //         throw err;
+    //     }
+    // }
 
+    async function uploadImageToCloudinary(file) {
+    try {
+        // ضغط الصورة (اختياري)
+        const compressedBlob = await compressImage(file);
+        
+        const formData = new FormData();
+        formData.append("file", compressedBlob);
+        formData.append("upload_preset", "roya-shop");
+
+        // استخدم proxy مجاني لتجاوز الحظر
+        const proxyUrl = "https://corsproxy.io/?"; // أو استخدم https://api.allorigins.win/raw?url=
+        const targetUrl = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/upload`;
+        
+        const response = await fetch(proxyUrl + encodeURIComponent(targetUrl), {
+            method: "POST",
+            body: formData
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        const data = await response.json();
+        return data.secure_url;
+    } catch (err) {
+        console.error("Upload error with proxy:", err);
+        throw new Error("فشل رفع الصورة: " + err.message);
+    }
+}
     function generateProductCode() { return 'ROY' + Math.random().toString(36).substring(2, 10).toUpperCase(); }
 
     function showToast(message, isError = false) {

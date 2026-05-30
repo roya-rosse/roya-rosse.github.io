@@ -168,7 +168,7 @@ function openProductModal(product) {
     const codeSpan = document.getElementById('productCodeDisplay');
     const productCode = product.code || generateTempCode();
     detailsDiv.innerHTML = `
-        <img src="${product.image}" class="product-modal-img" onerror="this.src='https://via.placeholder.com/300x500?text=صورة+غير+متوفرة'">
+        <img src="${product.image}" class="product-modal-img" id="productModalImage" style="cursor: pointer;" onerror="this.src='https://via.placeholder.com/300x500?text=صورة+غير+متوفرة'">
         <h3 style="color:#5E4B56; margin:0.5rem 0;">${escapeHtml(product.name)}</h3>
         <p style="color:#A89B9F;">${escapeHtml(product.desc || '')}</p>
         <p style="font-size:1.2rem; font-weight:bold; color:#D58B9A; margin:0.5rem 0;">${product.price} $</p>
@@ -177,6 +177,15 @@ function openProductModal(product) {
     codeSpan.innerText = productCode;
     modal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
+    
+    // إضافة حدث النقر على الصورة لتكبيرها
+    const modalImg = document.getElementById('productModalImage');
+    if (modalImg) {
+        modalImg.onclick = function(e) {
+            e.stopPropagation();
+            openLightbox(product.image, product.name);
+        };
+    }
 }
 
 document.getElementById('closeModalBtn')?.addEventListener('click', () => {
@@ -436,5 +445,72 @@ function escapeHtml(str) {
     if (!str) return '';
     return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
 }
+
+// ========== دوال Lightbox ==========
+function openLightbox(imgSrc, caption) {
+    const lightbox = document.getElementById('imageLightbox');
+    const lightboxImg = document.getElementById('lightboxImg');
+    const captionSpan = document.getElementById('lightbox-caption');
+    if (!lightbox || !lightboxImg) return;
+    lightboxImg.src = imgSrc;
+    captionSpan.innerText = caption || '';
+    lightbox.style.display = 'flex';
+    // إعادة تعيين التكبير عند الفتح
+    lightboxImg.classList.remove('zoomed');
+    lightboxImg.style.transform = '';
+    lightboxImg.style.cursor = 'zoom-in';
+}
+
+// إغلاق lightbox عند النقر على زر الإغلاق أو الخلفية
+document.querySelector('.lightbox-close')?.addEventListener('click', function(e) {
+    e.stopPropagation();
+    document.getElementById('imageLightbox').style.display = 'none';
+});
+
+document.getElementById('imageLightbox')?.addEventListener('click', function(e) {
+    if (e.target === this) {
+        this.style.display = 'none';
+    }
+});
+
+// تكبير/تصغير الصورة بالنقر عليها
+document.getElementById('lightboxImg')?.addEventListener('click', function(e) {
+    e.stopPropagation();
+    this.classList.toggle('zoomed');
+    if (this.classList.contains('zoomed')) {
+        this.style.cursor = 'zoom-out';
+    } else {
+        this.style.cursor = 'zoom-in';
+    }
+});
+
+// دعم تكبير الصورة بعجلة الماوس
+document.getElementById('lightboxImg')?.addEventListener('wheel', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    let currentScale = 1;
+    if (this.classList.contains('zoomed')) {
+        currentScale = 1.5;
+    } else {
+        currentScale = 1;
+    }
+    if (e.deltaY < 0) {
+        // تمرير لأعلى -> تكبير أكثر
+        currentScale += 0.1;
+        this.style.transform = `scale(${Math.min(currentScale, 3)})`;
+        this.style.cursor = 'zoom-out';
+        if (currentScale > 1.2) this.classList.add('zoomed');
+    } else if (e.deltaY > 0) {
+        // تمرير لأسفل -> تصغير
+        currentScale -= 0.1;
+        if (currentScale <= 1) {
+            this.classList.remove('zoomed');
+            this.style.transform = '';
+            this.style.cursor = 'zoom-in';
+        } else {
+            this.style.transform = `scale(${currentScale})`;
+        }
+    }
+});
 
 loadData();

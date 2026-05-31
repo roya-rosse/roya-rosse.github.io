@@ -478,9 +478,9 @@ document.getElementById('lightboxImg')?.addEventListener('click', function(e) {
     e.stopPropagation();
     if (!this.classList.contains('zoomed')) {
         this.classList.add('zoomed');
-        this.style.transform = 'scale(2.5)';
+        this.style.transform = 'scale(2)';
         this.style.cursor = 'zoom-out';
-        this.dataset.scale = '2.5';
+        this.dataset.scale = '2';
     } else {
         this.classList.remove('zoomed');
         this.style.transform = '';
@@ -494,7 +494,7 @@ document.getElementById('lightboxImg')?.addEventListener('wheel', function(e) {
     e.stopPropagation();
     let currentScale = parseFloat(this.dataset.scale) || 1;
     if (e.deltaY < 0) {
-        currentScale = Math.min(currentScale + 0.2, 3);
+        currentScale = Math.min(currentScale + 0.2, 2);
     } else if (e.deltaY > 0) {
         currentScale = Math.max(currentScale - 0.2, 1);
     }

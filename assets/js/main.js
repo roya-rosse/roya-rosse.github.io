@@ -21,7 +21,7 @@ let autoSlideInterval = null;
 
 function generateTempCode() { return 'ROY' + Math.random().toString(36).substring(2, 10).toUpperCase(); }
 
-// إشعار صغير
+// إشعار صغير يظهر ويختفي
 function showToast(message, isError = false) {
     let toast = document.getElementById('customToast');
     if (!toast) {
@@ -116,7 +116,7 @@ function renderCategories() {
     const container = document.getElementById('categoriesGrid');
     if (!container) return;
     const activeCats = categories.filter(c => c.active);
-    // ترتيب حسب order (0-based) تصاعدياً
+    // ترتيب الفئات حسب order (تصاعدي)
     const sorted = [...activeCats].sort((a,b) => (a.order || 0) - (b.order || 0));
     if (sorted.length === 0) { container.innerHTML = '<div style="text-align:center; padding:20px;">لا توجد فئات</div>'; return; }
     container.innerHTML = sorted.map(cat => `
@@ -170,7 +170,7 @@ function openProductModal(product) {
     const codeSpan = document.getElementById('productCodeDisplay');
     const productCode = product.code || generateTempCode();
     detailsDiv.innerHTML = `
-        <img src="${product.image}" class="product-modal-img" onerror="this.src='https://via.placeholder.com/300x500?text=صورة+غير+متوفرة'">
+        <img src="${product.image}" class="product-modal-img" id="productModalImage" style="cursor: pointer;" onerror="this.src='https://via.placeholder.com/300x500?text=صورة+غير+متوفرة'">
         <h3 style="color:#5E4B56; margin:0.5rem 0;">${escapeHtml(product.name)}</h3>
         <p style="color:#A89B9F;">${escapeHtml(product.desc || '')}</p>
         <p style="font-size:1.2rem; font-weight:bold; color:#D58B9A; margin:0.5rem 0;">${product.price} $</p>
@@ -179,6 +179,15 @@ function openProductModal(product) {
     codeSpan.innerText = productCode;
     modal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
+    
+    // ربط حدث النقر على الصورة لفتح Lightbox
+    const modalImg = document.getElementById('productModalImage');
+    if (modalImg) {
+        modalImg.onclick = (e) => {
+            e.stopPropagation();
+            openLightbox(product.image, product.name);
+        };
+    }
 }
 
 document.getElementById('closeModalBtn')?.addEventListener('click', () => {
@@ -438,5 +447,66 @@ function escapeHtml(str) {
     if (!str) return '';
     return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
 }
+
+// ========== دوال Lightbox ==========
+function openLightbox(imgSrc, caption) {
+    const lightbox = document.getElementById('imageLightbox');
+    const lightboxImg = document.getElementById('lightboxImg');
+    const captionSpan = document.getElementById('lightbox-caption');
+    if (!lightbox || !lightboxImg) return;
+    lightboxImg.src = imgSrc;
+    captionSpan.innerText = caption || '';
+    lightbox.style.display = 'flex';
+    lightboxImg.classList.remove('zoomed');
+    lightboxImg.style.transform = '';
+    lightboxImg.style.cursor = 'zoom-in';
+    lightboxImg.dataset.scale = '1';
+}
+
+document.querySelector('.lightbox-close')?.addEventListener('click', function(e) {
+    e.stopPropagation();
+    document.getElementById('imageLightbox').style.display = 'none';
+});
+
+document.getElementById('imageLightbox')?.addEventListener('click', function(e) {
+    if (e.target === this) {
+        this.style.display = 'none';
+    }
+});
+
+document.getElementById('lightboxImg')?.addEventListener('click', function(e) {
+    e.stopPropagation();
+    if (!this.classList.contains('zoomed')) {
+        this.classList.add('zoomed');
+        this.style.transform = 'scale(2.5)';
+        this.style.cursor = 'zoom-out';
+        this.dataset.scale = '2.5';
+    } else {
+        this.classList.remove('zoomed');
+        this.style.transform = '';
+        this.style.cursor = 'zoom-in';
+        this.dataset.scale = '1';
+    }
+});
+
+document.getElementById('lightboxImg')?.addEventListener('wheel', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    let currentScale = parseFloat(this.dataset.scale) || 1;
+    if (e.deltaY < 0) {
+        currentScale = Math.min(currentScale + 0.2, 3);
+    } else if (e.deltaY > 0) {
+        currentScale = Math.max(currentScale - 0.2, 1);
+    }
+    this.style.transform = `scale(${currentScale})`;
+    this.dataset.scale = currentScale;
+    if (currentScale > 1.05) {
+        this.classList.add('zoomed');
+        this.style.cursor = 'zoom-out';
+    } else {
+        this.classList.remove('zoomed');
+        this.style.cursor = 'zoom-in';
+    }
+});
 
 loadData();

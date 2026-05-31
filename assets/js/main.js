@@ -21,7 +21,7 @@ let autoSlideInterval = null;
 
 function generateTempCode() { return 'ROY' + Math.random().toString(36).substring(2, 10).toUpperCase(); }
 
-// إشعار صغير يظهر ويختفي
+// إشعار صغير
 function showToast(message, isError = false) {
     let toast = document.getElementById('customToast');
     if (!toast) {
@@ -66,16 +66,16 @@ async function loadData() {
         ads = adsSnap.val() ? Object.keys(adsSnap.val()).map(key => ({ id: key, ...adsSnap.val()[key] })) : [];
         if (categories.length === 0) {
             categories = [
-                { id: "cat1", name: "إكسسوارات", image: "https://cdn-icons-png.flaticon.com/512/1077/1077035.png", active: true },
-                { id: "cat2", name: "عطور", image: "https://cdn-icons-png.flaticon.com/512/1923/1923745.png", active: true },
-                { id: "cat3", name: "حقائب", image: "https://cdn-icons-png.flaticon.com/512/2589/2589175.png", active: true },
-                { id: "cat4", name: "أحذية", image: "https://cdn-icons-png.flaticon.com/512/3114/3114886.png", active: true },
-                { id: "cat5", name: "ملابس", image: "https://cdn-icons-png.flaticon.com/512/775/775926.png", active: true },
-                { id: "cat6", name: "مكياج", image: "https://cdn-icons-png.flaticon.com/512/3014/3014582.png", active: true },
-                { id: "cat7", name: "مجوهرات", image: "https://cdn-icons-png.flaticon.com/512/3657/3657297.png", active: true },
-                { id: "cat8", name: "ساعات", image: "https://cdn-icons-png.flaticon.com/512/4836/4836642.png", active: true },
-                { id: "cat9", name: "عناية", image: "https://cdn-icons-png.flaticon.com/512/2938/2938253.png", active: true },
-                { id: "cat10", name: "حسومات", image: "https://cdn-icons-png.flaticon.com/512/2838/2838912.png", active: true }
+                { id: "cat1", name: "إكسسوارات", image: "https://cdn-icons-png.flaticon.com/512/1077/1077035.png", active: true, order: 0 },
+                { id: "cat2", name: "عطور", image: "https://cdn-icons-png.flaticon.com/512/1923/1923745.png", active: true, order: 1 },
+                { id: "cat3", name: "حقائب", image: "https://cdn-icons-png.flaticon.com/512/2589/2589175.png", active: true, order: 2 },
+                { id: "cat4", name: "أحذية", image: "https://cdn-icons-png.flaticon.com/512/3114/3114886.png", active: true, order: 3 },
+                { id: "cat5", name: "ملابس", image: "https://cdn-icons-png.flaticon.com/512/775/775926.png", active: true, order: 4 },
+                { id: "cat6", name: "مكياج", image: "https://cdn-icons-png.flaticon.com/512/3014/3014582.png", active: true, order: 5 },
+                { id: "cat7", name: "مجوهرات", image: "https://cdn-icons-png.flaticon.com/512/3657/3657297.png", active: true, order: 6 },
+                { id: "cat8", name: "ساعات", image: "https://cdn-icons-png.flaticon.com/512/4836/4836642.png", active: true, order: 7 },
+                { id: "cat9", name: "عناية", image: "https://cdn-icons-png.flaticon.com/512/2938/2938253.png", active: true, order: 8 },
+                { id: "cat10", name: "حسومات", image: "https://cdn-icons-png.flaticon.com/512/2838/2838912.png", active: true, order: 9 }
             ];
             await saveCategories();
         }
@@ -88,7 +88,7 @@ async function loadData() {
 
 async function saveCategories() {
     const obj = {};
-    categories.forEach(c => { obj[c.id] = { name: c.name, image: c.image, active: c.active }; });
+    categories.forEach(c => { obj[c.id] = { name: c.name, image: c.image, active: c.active, order: c.order !== undefined ? c.order : 0 }; });
     await database.ref('categories').set(obj);
 }
 
@@ -116,8 +116,10 @@ function renderCategories() {
     const container = document.getElementById('categoriesGrid');
     if (!container) return;
     const activeCats = categories.filter(c => c.active);
-    if (activeCats.length === 0) { container.innerHTML = '<div style="text-align:center; padding:20px;">لا توجد فئات</div>'; return; }
-    container.innerHTML = activeCats.map(cat => `
+    // ترتيب حسب order (0-based) تصاعدياً
+    const sorted = [...activeCats].sort((a,b) => (a.order || 0) - (b.order || 0));
+    if (sorted.length === 0) { container.innerHTML = '<div style="text-align:center; padding:20px;">لا توجد فئات</div>'; return; }
+    container.innerHTML = sorted.map(cat => `
         <div class="category-card" data-category-id="${cat.id}">
             <img src="${cat.image}" alt="${cat.name}">
             <h4>${escapeHtml(cat.name)}</h4>
@@ -168,7 +170,7 @@ function openProductModal(product) {
     const codeSpan = document.getElementById('productCodeDisplay');
     const productCode = product.code || generateTempCode();
     detailsDiv.innerHTML = `
-        <img src="${product.image}" class="product-modal-img" id="productModalImage" style="cursor: pointer;" onerror="this.src='https://via.placeholder.com/300x500?text=صورة+غير+متوفرة'">
+        <img src="${product.image}" class="product-modal-img" onerror="this.src='https://via.placeholder.com/300x500?text=صورة+غير+متوفرة'">
         <h3 style="color:#5E4B56; margin:0.5rem 0;">${escapeHtml(product.name)}</h3>
         <p style="color:#A89B9F;">${escapeHtml(product.desc || '')}</p>
         <p style="font-size:1.2rem; font-weight:bold; color:#D58B9A; margin:0.5rem 0;">${product.price} $</p>
@@ -177,15 +179,6 @@ function openProductModal(product) {
     codeSpan.innerText = productCode;
     modal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
-    
-    // إضافة حدث النقر على الصورة لتكبيرها
-    const modalImg = document.getElementById('productModalImage');
-    if (modalImg) {
-        modalImg.onclick = function(e) {
-            e.stopPropagation();
-            openLightbox(product.image, product.name);
-        };
-    }
 }
 
 document.getElementById('closeModalBtn')?.addEventListener('click', () => {
@@ -373,7 +366,7 @@ window.addEventListener('click', (e) => { if (e.target === modal) modal.style.di
 document.getElementById('footerContactLink')?.addEventListener('click', (e) => { e.preventDefault(); if (modal) modal.style.display = 'flex'; });
 document.getElementById('wishlistIcon')?.addEventListener('click', () => alert('المفضلة قريباً'));
 
-// التحديث التلقائي للمتجر (يُستدعى من لوحة الأدمن)
+// التحديث التلقائي للمتجر
 window.updateStoreData = async function() {
     try {
         const [prodSnap, catSnap, adsSnap] = await Promise.all([
@@ -445,72 +438,5 @@ function escapeHtml(str) {
     if (!str) return '';
     return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
 }
-
-// ========== دوال Lightbox ==========
-function openLightbox(imgSrc, caption) {
-    const lightbox = document.getElementById('imageLightbox');
-    const lightboxImg = document.getElementById('lightboxImg');
-    const captionSpan = document.getElementById('lightbox-caption');
-    if (!lightbox || !lightboxImg) return;
-    lightboxImg.src = imgSrc;
-    captionSpan.innerText = caption || '';
-    lightbox.style.display = 'flex';
-    // إعادة تعيين التكبير عند الفتح
-    lightboxImg.classList.remove('zoomed');
-    lightboxImg.style.transform = '';
-    lightboxImg.style.cursor = 'zoom-in';
-}
-
-// إغلاق lightbox عند النقر على زر الإغلاق أو الخلفية
-document.querySelector('.lightbox-close')?.addEventListener('click', function(e) {
-    e.stopPropagation();
-    document.getElementById('imageLightbox').style.display = 'none';
-});
-
-document.getElementById('imageLightbox')?.addEventListener('click', function(e) {
-    if (e.target === this) {
-        this.style.display = 'none';
-    }
-});
-
-// تكبير/تصغير الصورة بالنقر عليها
-document.getElementById('lightboxImg')?.addEventListener('click', function(e) {
-    e.stopPropagation();
-    this.classList.toggle('zoomed');
-    if (this.classList.contains('zoomed')) {
-        this.style.cursor = 'zoom-out';
-    } else {
-        this.style.cursor = 'zoom-in';
-    }
-});
-
-// دعم تكبير الصورة بعجلة الماوس
-document.getElementById('lightboxImg')?.addEventListener('wheel', function(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    let currentScale = 1;
-    if (this.classList.contains('zoomed')) {
-        currentScale = 1.5;
-    } else {
-        currentScale = 1;
-    }
-    if (e.deltaY < 0) {
-        // تمرير لأعلى -> تكبير أكثر
-        currentScale += 0.1;
-        this.style.transform = `scale(${Math.min(currentScale, 3)})`;
-        this.style.cursor = 'zoom-out';
-        if (currentScale > 1.2) this.classList.add('zoomed');
-    } else if (e.deltaY > 0) {
-        // تمرير لأسفل -> تصغير
-        currentScale -= 0.1;
-        if (currentScale <= 1) {
-            this.classList.remove('zoomed');
-            this.style.transform = '';
-            this.style.cursor = 'zoom-in';
-        } else {
-            this.style.transform = `scale(${currentScale})`;
-        }
-    }
-});
 
 loadData();

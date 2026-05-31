@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <title>لوحة الأدمن - رويـا (صلاحيات متكاملة)</title>
+    <title>لوحة الأدمن - رويـا</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
@@ -40,6 +40,7 @@
         .category-products-area { margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed #FFE4E8; display: none; }
         .category-products-area.open { display: block; }
         .form-group { margin-bottom: 1rem; }
+        label { display: block; margin-bottom: 0.3rem; font-size: 0.85rem; font-weight: 500; color: #5E4B56; }
         input, textarea, select { width: 100%; padding: 10px 15px; border: 1px solid #FFE4E8; border-radius: 30px; font-family: inherit; font-size: 0.9rem; transition: 0.2s; }
         input:focus, textarea:focus { outline: none; border-color: #FF9AAE; box-shadow: 0 0 0 2px rgba(255,154,174,0.2); }
         .file-upload-btn { background: #F0F0F0; padding: 10px 20px; border-radius: 40px; cursor: pointer; display: inline-flex; align-items: center; gap: 10px; font-size: 0.85rem; transition: 0.2s; border: 1px solid #FFE4E8; }
@@ -69,6 +70,7 @@
         <button id="logoutBtn" class="logout-btn"><i class="fas fa-sign-out-alt"></i> خروج</button>
     </div>
 
+    <!-- قسم الإعلانات -->
     <div id="adsSection" class="section">
         <div class="section-header" onclick="toggleSection('adsContent')">
             <span><i class="fas fa-ad"></i> إدارة الإعلانات</span>
@@ -88,6 +90,7 @@
         </div>
     </div>
 
+    <!-- قسم الفئات والمنتجات -->
     <div class="section">
         <div class="section-header" onclick="toggleSection('categoriesContent')">
             <span><i class="fas fa-th-large"></i> إدارة الفئات والمنتجات</span>
@@ -101,12 +104,17 @@
                 <div class="file-upload-btn" onclick="document.getElementById('newCatImageFile').click()"><i class="fas fa-cloud-upload-alt"></i> اختر صورة الفئة</div>
                 <input type="file" id="newCatImageFile" accept="image/*" style="display:none">
                 <div id="newCatFileName" style="font-size:0.7rem;">📁 لم يتم اختيار ملف</div>
+                <div class="form-group">
+                    <label>رقم الترتيب (1 للأولى، 2 للثانية، ...)</label>
+                    <input type="number" id="newCatOrder" value="1" min="1">
+                </div>
                 <button id="addCategoryBtn" class="btn btn-primary btn-block mt-2"><i class="fas fa-plus"></i> إضافة فئة</button>
                 <div id="newCatLoader" style="display:none;"><i class="fas fa-spinner fa-spin"></i> جاري...</div>
             </div>
         </div>
     </div>
 
+    <!-- قسم جميع المنتجات -->
     <div class="section">
         <div class="section-header" onclick="toggleSection('allProductsContent')">
             <span><i class="fas fa-boxes"></i> جميع المنتجات</span>
@@ -208,7 +216,14 @@
                 await db.ref('ads').set(adsObj);
             }
             const catsObj = {};
-            categories.forEach(c => { catsObj[c.id] = { name: c.name, image: c.image, active: c.active }; });
+            categories.forEach(c => {
+                catsObj[c.id] = {
+                    name: c.name,
+                    image: c.image,
+                    active: c.active,
+                    order: (c.order !== undefined ? c.order : 0)
+                };
+            });
             await db.ref('categories').set(catsObj);
             const prodsObj = {};
             products.forEach(p => { prodsObj[p.id] = { name: p.name, price: p.price, oldprice: p.oldprice || '', desc: p.desc || '', image: p.image, categoryId: p.categoryId, code: p.code || generateProductCode(), active: p.active, createdAt: p.createdAt || null }; });
@@ -242,9 +257,59 @@
         ads.forEach(ad => { const fi = document.getElementById(`editAdFile_${ad.id}`); if(fi) fi.onchange = (e) => { tempEditAdFile = e.target.files[0]; showToast("تم اختيار صورة جديدة"); }; });
     }
 
+    // ===================== دوال إعادة الترتيب الديناميكي =====================
+    function shiftCategoryOrder(targetId, newOrder1Based) {
+        // newOrder1Based هو الرقم الجديد للمرتبة (من 1 إلى عدد الفئات)
+        const targetCat = categories.find(c => c.id === targetId);
+        if (!targetCat) return false;
+        
+        // إزالة الفئة المستهدفة مؤقتًا من المصفوفة (لنأخذ نسخة)
+        let otherCats = categories.filter(c => c.id !== targetId);
+        // ترتيب الباقي حسب order الحالي (0-based)
+        otherCats.sort((a,b) => (a.order || 0) - (b.order || 0));
+        
+        // الرقم الجديد 0-based
+        const newOrder = newOrder1Based - 1;
+        
+        // سنقوم بإعادة بناء المصفوفة مع إدراج targetCat في الموضع المناسب
+        // وإزاحة باقي الفئات تلقائيًا
+        let newList = [];
+        let inserted = false;
+        for (let cat of otherCats) {
+            let currentOrder = cat.order !== undefined ? cat.order : 0;
+            if (!inserted && currentOrder >= newOrder) {
+                targetCat.order = newOrder;
+                newList.push(targetCat);
+                inserted = true;
+                cat.order = currentOrder + 1;
+                newList.push(cat);
+            } else {
+                newList.push(cat);
+            }
+        }
+        if (!inserted) {
+            targetCat.order = newOrder;
+            newList.push(targetCat);
+        }
+        // إعادة ترتيب القائمة الجديدة حسب order
+        newList.sort((a,b) => (a.order || 0) - (b.order || 0));
+        // تعيين المصفوفة الجديدة إلى categories
+        categories.length = 0;
+        newList.forEach(c => categories.push(c));
+        return true;
+    }
+
+    // وظيفة إعادة التوزيع الكامل (تأكد من أن الأرقام من 0 إلى n-1)
+    function renumberOrders() {
+        categories.sort((a,b) => (a.order || 0) - (b.order || 0));
+        categories.forEach((cat, idx) => { cat.order = idx; });
+    }
+
     function renderCategories() {
         const container = document.getElementById('categoriesList');
         if (!container) return;
+        // التأكد من الترتيب قبل العرض
+        categories.sort((a,b) => (a.order || 0) - (b.order || 0));
         container.innerHTML = categories.map(cat => `
             <div class="category-card">
                 <div class="category-header">
@@ -256,9 +321,13 @@
                     </div>
                 </div>
                 <div id="editCatForm_${cat.id}" class="edit-category-form">
-                    <input type="text" id="editCatName_${cat.id}" value="${cat.name}">
+                    <input type="text" id="editCatName_${cat.id}" value="${cat.name}" placeholder="اسم الفئة">
                     <div class="file-upload-btn" onclick="document.getElementById('editCatFile_${cat.id}').click()"><i class="fas fa-cloud-upload-alt"></i> تغيير الصورة</div>
                     <input type="file" id="editCatFile_${cat.id}" style="display:none">
+                    <div class="form-group">
+                        <label>رقم الترتيب (1 للأولى، 2 للثانية، ...)</label>
+                        <input type="number" id="editCatOrder_${cat.id}" value="${(cat.order !== undefined ? cat.order + 1 : 1)}" min="1" max="${categories.length}">
+                    </div>
                     <div class="flex-start mt-2"><button class="btn btn-primary btn-sm" onclick="updateCategory('${cat.id}')">حفظ</button><button class="btn btn-secondary btn-sm" onclick="closeEditCatForm('${cat.id}')">إلغاء</button></div>
                 </div>
                 <div class="toggle-products-btn" onclick="toggleCatProducts('${cat.id}')"><i class="fas fa-chevron-down" id="toggleIcon_${cat.id}"></i> عرض المنتجات (${products.filter(p=>p.categoryId===cat.id).length})</div>
@@ -332,29 +401,42 @@
         renderFilteredProducts();
     }
 
-    // دوال الإعلانات (تتحقق من الصلاحية)
+    // دوال الإعلانات
     window.toggleAd = async (id) => { if (currentUserRole !== 'super') return showToast("غير مصرح", true); const ad=ads.find(a=>a.id===id); ad.active=!ad.active; await saveAll('adsContent'); };
     window.deleteAd = async (id) => { if (currentUserRole !== 'super') return; ads=ads.filter(a=>a.id!==id); await saveAll('adsContent'); };
     window.showEditAd = (id) => { if (currentUserRole !== 'super') return; document.getElementById(`editAd_${id}`).style.display = 'block'; };
     window.updateAdImage = async (id) => { if (currentUserRole !== 'super') return; if(!tempEditAdFile){ showToast("اختر صورة",true); return; } const url=await uploadImageToCloudinary(tempEditAdFile); const ad=ads.find(a=>a.id===id); ad.image=url; await saveAll('adsContent'); tempEditAdFile=null; showToast("تم تحديث الصورة"); };
     window.updateAdText = async (id) => { if (currentUserRole !== 'super') return; const ad=ads.find(a=>a.id===id); ad.text=document.getElementById(`editAdTxt_${id}`).value; await saveAll('adsContent'); showToast("تم حفظ النص"); };
 
-    // دوال الفئات والمنتجات (لجميع الأدمن)
+    // دوال الفئات والمنتجات
     window.openEditCatForm = (id) => { document.getElementById(`editCatForm_${id}`).classList.add('open'); };
     window.closeEditCatForm = (id) => { document.getElementById(`editCatForm_${id}`).classList.remove('open'); };
+    
     window.updateCategory = async (id) => {
         const newName = document.getElementById(`editCatName_${id}`).value.trim();
         if(!newName) return showToast("اسم الفئة مطلوب", true);
+        const orderRaw = document.getElementById(`editCatOrder_${id}`).value;
+        let newOrder = parseInt(orderRaw, 10);
+        if (isNaN(newOrder)) return showToast("يجب إدخال رقم صحيح للترتيب", true);
+        if (newOrder < 1) return showToast("رقم الترتيب لا يمكن أن يكون أقل من 1", true);
+        if (newOrder > categories.length) return showToast(`رقم الترتيب لا يمكن أن يتجاوز عدد الفئات (${categories.length})`, true);
+        
         const cat = categories.find(c=>c.id===id);
         cat.name = newName;
         if(tempEditCatFile) { cat.image = await uploadImageToCloudinary(tempEditCatFile); tempEditCatFile = null; }
+        // إعادة الترتيب باستخدام الإزاحة
+        shiftCategoryOrder(id, newOrder);
+        // إعادة ترقيم متسلسل (اختياري للحفاظ على الترتيب 1,2,3,...)
+        renumberOrders();
         await saveAll('categoriesContent');
         closeEditCatForm(id);
-        showToast("تم تعديل الفئة");
+        showToast("تم تعديل الفئة وإعادة الترتيب");
     };
+    
     window.toggleCategory = async (id) => { const cat=categories.find(c=>c.id===id); cat.active=!cat.active; await saveAll('categoriesContent'); };
-    window.deleteCategory = async (id) => { if(confirm("سيتم حذف كل منتجاتها")){ categories=categories.filter(c=>c.id!==id); products=products.filter(p=>p.categoryId!==id); await saveAll('categoriesContent'); } };
+    window.deleteCategory = async (id) => { if(confirm("سيتم حذف كل منتجاتها")){ categories=categories.filter(c=>c.id!==id); products=products.filter(p=>p.categoryId!==id); renumberOrders(); await saveAll('categoriesContent'); } };
     window.toggleCatProducts = (id) => { const area=document.getElementById(`catProducts_${id}`); const icon=document.getElementById(`toggleIcon_${id}`); if(area.classList.contains('open')){ area.classList.remove('open'); icon.style.transform='rotate(0deg)'; }else{ area.classList.add('open'); icon.style.transform='rotate(180deg)'; } };
+    
     window.addProductToCategory = async (catId) => {
         const name = document.getElementById(`prodName_${catId}`).value.trim();
         const price = document.getElementById(`prodPrice_${catId}`).value.trim();
@@ -390,6 +472,7 @@
         loader.style.display = 'none';
         btn.disabled = false;
     };
+    
     window.editProduct = (id) => { document.getElementById(`editForm_${id}`).style.display = 'block'; };
     window.updateProductImage = async (id) => { if(!tempEditProductFile[id]) return showToast("اختر صورة",true); const url=await uploadImageToCloudinary(tempEditProductFile[id]); const prod=products.find(p=>p.id===id); prod.image=url; await saveAll(null); delete tempEditProductFile[id]; document.getElementById(`editForm_${id}`).style.display='none'; showToast("تم تحديث الصورة"); };
     window.updateProductData = async (id) => { const prod=products.find(p=>p.id===id); prod.name=document.getElementById(`editName_${id}`).value; prod.price=document.getElementById(`editPrice_${id}`).value; prod.oldprice=document.getElementById(`editOld_${id}`).value; prod.desc=document.getElementById(`editDesc_${id}`).value; let nc=document.getElementById(`editCode_${id}`).value.trim(); if(nc) prod.code=nc; await saveAll(null); document.getElementById(`editForm_${id}`).style.display='none'; showToast("تم تعديل المنتج"); };
@@ -409,6 +492,8 @@
             ads = adsSnap.val() ? Object.keys(adsSnap.val()).map(k=>({id:k, ...adsSnap.val()[k]})) : [];
             categories = catSnap.val() ? Object.keys(catSnap.val()).map(k=>({id:k, ...catSnap.val()[k]})) : [];
             products = prodSnap.val() ? Object.keys(prodSnap.val()).map(k=>({id:k, ...prodSnap.val()[k]})) : [];
+            categories.forEach((c, idx) => { if (c.order === undefined) c.order = idx; });
+            categories.sort((a,b) => (a.order || 0) - (b.order || 0));
             renderAll();
             document.getElementById('searchAllProducts')?.addEventListener('input', (e) => { lastSearchText = e.target.value; renderFilteredProducts(); });
         } catch(err) { console.error(err); showToast("خطأ في تحميل البيانات", true); }
@@ -445,23 +530,38 @@
     });
     document.getElementById('logoutBtn').onclick = () => auth.signOut().then(() => window.location.href = 'login-9k2F7dL3xP1qZ8mW.html');
 
+    // إضافة فئة جديدة مع إزاحة
     document.getElementById('addCategoryBtn').onclick = async () => {
         const name = document.getElementById('newCatName').value.trim();
         const fileInput = document.getElementById('newCatImageFile');
         if(!name || !fileInput.files.length) return showToast("اسم الفئة وصورة مطلوبان", true);
+        let orderRaw = document.getElementById('newCatOrder').value;
+        let order = parseInt(orderRaw, 10);
+        if (isNaN(order)) order = categories.length + 1;
+        if (order < 1) order = 1;
+        const maxOrder = categories.length + 1;
+        if (order > maxOrder) order = maxOrder;
+        
         const loader = document.getElementById('newCatLoader');
         loader.style.display = 'block';
         try {
             const url = await uploadImageToCloudinary(fileInput.files[0]);
-            categories.push({ id: Date.now().toString(), name, image: url, active: true });
+            const newId = Date.now().toString();
+            const newCat = { id: newId, name, image: url, active: true };
+            categories.push(newCat);
+            // تطبيق الإزاحة
+            shiftCategoryOrder(newId, order);
+            renumberOrders();
             await saveAll('categoriesContent');
             document.getElementById('newCatName').value = '';
             fileInput.value = '';
             document.getElementById('newCatFileName').innerHTML = '📁 لم يتم اختيار ملف';
-            showToast("تمت إضافة الفئة");
+            document.getElementById('newCatOrder').value = '1';
+            showToast("تمت إضافة الفئة بالترتيب المطلوب");
         } catch(err) { showToast(err.message, true); }
         loader.style.display = 'none';
     };
+    
     document.getElementById('newCatImageFile').onchange = (e) => { document.getElementById('newCatFileName').innerHTML = `📁 ${e.target.files[0]?.name || ''}`; };
     document.getElementById('addAdBtn').onclick = async () => {
         if (currentUserRole !== 'super') return showToast("غير مصرح لك", true);

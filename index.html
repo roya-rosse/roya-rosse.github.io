@@ -3,12 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>متجر رويا روز  | Roya Rosse - متجر إلكتروني للإكسسوارات والموضة</title>
+    <title>متجر رويا روز | Roya Rosse - متجر إلكتروني للإكسسوارات والموضة</title>
     <link rel="stylesheet" href="assets/css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="icon" type="image/png" href="assets/img/rosse.png">
     <link rel="apple-touch-icon" sizes="180x180" href="assets/img/rosse.png">
+    <link rel="apple-touch-icon" sizes="64x64" href="assets/img/rosse.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="assets/img/rosse.png">
     <meta name="description" content="اكتشفي تشكيلة رويـا (Roya Rosse) الفاخرة من الإكسسوارات، والحقائب، والعطور. تسوقي الآن لأحدث صيحات الموضة.">
     <link rel="canonical" href="https://roya-rosse.github.io/">
     <script type="application/ld+json">
@@ -51,7 +53,12 @@
     <meta property="og:type" content="website">
     <meta name="robots" content="index, follow">
     <meta name="google-site-verification" content="CRehjQR1EXnFRFnHbs4YkN5Hv_U6YcAf2x8yEocPWBc" />
-    <!-- Google tag (gtag.js) -->
+    <link rel="icon" type="image/png" sizes="512x512" href="assets/img/rosse.png">
+    <link rel="apple-touch-icon" href="assets/img/rosse.png">
+    <meta property="og:image" content="assets/img/rosse.png">
+    <meta property="og:image:width" content="512">
+    <meta property="og:image:height" content="512">
+    <link rel="icon" type="image/png" href="assets/img/fa2.png">
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-90EQCCN9SK"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -62,7 +69,6 @@
 </head>
 <body>
 
-    <!-- Navbar Desktop -->
     <nav class="navbar-desktop">
         <div class="nav-container">
             <div class="logo">
@@ -86,7 +92,6 @@
         </div>
     </nav>
 
-    <!-- Mobile Header -->
     <div class="mobile-header">
         <div class="mobile-logo">
             <a href="index.html">
@@ -102,7 +107,6 @@
         </div>
     </div>
 
-    <!-- Mobile Bottom Navbar -->
     <div class="navbar-mobile">
         <div class="mobile-nav-item active" data-page="home">
             <i class="fas fa-home"></i>
@@ -118,7 +122,6 @@
         </div>
     </div>
 
-    <!-- سلايدر الإعلانات -->
     <div class="ads-slider-container">
         <div class="ads-slider" id="adsSlider"></div>
         <button class="slider-btn prev" id="prevAdBtn">❮</button>
@@ -126,26 +129,33 @@
         <div class="slider-dots" id="sliderDots"></div>
     </div>
 
-    <!-- شبكة الفئات -->
     <div class="categories-grid" id="categoriesGrid"></div>
 
-    <!-- قسم المنتجات العشوائية -->
+    <!-- قسم المنتجات العشوائية مع أزرار -->
     <div class="section-title">
         <h2>✨ اكتشفي منتجات عشوائية</h2>
         <p>تشكيلة مختارة لكِ</p>
     </div>
-    <div class="scroll-products" id="randomProducts"></div>
+    <div class="products-slider-wrapper">
+        <button class="slider-nav-btn" id="randomPrevBtn"><i class="fas fa-chevron-right"></i></button>
+        <div class="scroll-products" id="randomProducts"></div>
+        <button class="slider-nav-btn" id="randomNextBtn"><i class="fas fa-chevron-left"></i></button>
+    </div>
 
-    <!-- نافذة عرض المنتجات -->
+    <!-- نافذة المنتجات للفئات والبحث مع أزرار -->
     <div class="products-section" id="productsSection" style="display: none;">
         <div class="products-header">
             <button class="close-products" id="closeProductsBtn"><i class="fas fa-times"></i></button>
             <h3 id="selectedCategoryTitle"></h3>
         </div>
-        <div class="scroll-products" id="productsScroll"></div>
+        <div class="products-slider-wrapper">
+            <button class="slider-nav-btn" id="categoryPrevBtn"><i class="fas fa-chevron-right"></i></button>
+            <div class="scroll-products" id="productsScroll"></div>
+            <button class="slider-nav-btn" id="categoryNextBtn"><i class="fas fa-chevron-left"></i></button>
+        </div>
     </div>
 
-    <!-- نافذة تفاصيل المنتج (تواصل عبر انستغرام) -->
+    <!-- نافذة المنتج -->
     <div class="product-modal" id="productModal" style="display: none;">
         <div class="product-modal-content">
             <button class="close-modal" id="closeModalBtn"><i class="fas fa-times"></i></button>
@@ -162,14 +172,13 @@
         </div>
     </div>
 
-    <!-- Lightbox لتكبير الصور -->
+    <!-- Lightbox -->
     <div id="imageLightbox" class="lightbox" style="display: none;">
         <span class="lightbox-close">&times;</span>
         <img class="lightbox-content" id="lightboxImg">
         <div id="lightbox-caption" class="lightbox-caption"></div>
     </div>
 
-    <!-- مودال التواصل -->
     <div id="contactModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
@@ -178,7 +187,6 @@
         </div>
     </div>
 
-    <!-- فوتر -->
     <footer class="footer">
         <div class="footer-container">
             <div class="footer-section">

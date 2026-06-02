@@ -943,3 +943,49 @@ body {
         display: none !important;
     }
 }
+
+/* قسم المصمم في الفوتر */
+.designer-links {
+    margin-top: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.8rem;
+    color: #aaa;
+}
+
+.designer-bio {
+    color: #aaa;
+    font-size: 0.75rem;
+}
+
+.designer-links a {
+    color: #aaa;
+    transition: 0.3s;
+    font-size: 1.1rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+
+.designer-links a.designer-wa:hover {
+    color: #25D366;
+}
+
+.designer-links a.designer-ig:hover {
+    color: #E4405F;
+}
+
+@media (max-width: 768px) {
+    .designer-links {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    .designer-bio {
+        width: 100%;
+        text-align: center;
+        margin-bottom: 5px;
+    }
+}

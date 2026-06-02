@@ -1,0 +1,124 @@
+/* ===== قسم المصمم المطور (تصميم ملفت وجذاب) ===== */
+.designer-showcase {
+    margin-top: 2rem;
+    padding: 1rem;
+    background: linear-gradient(135deg, #FFF0F3, #FFF5F7);
+    border-radius: 30px;
+    border: 1px solid #FFE4E8;
+}
+
+.designer-card {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    background: white;
+    border-radius: 25px;
+    padding: 1.2rem;
+    box-shadow: 0 8px 20px rgba(255,154,174,0.15);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.designer-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(255,154,174,0.25);
+}
+
+.designer-icon {
+    background: #FF9AAE;
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: white;
+    flex-shrink: 0;
+    transition: 0.3s;
+}
+
+.designer-card:hover .designer-icon {
+    background: #D58B9A;
+    transform: scale(1.05);
+}
+
+.designer-info h3 {
+    color: #5E4B56;
+    font-size: 1.3rem;
+    margin-bottom: 0.3rem;
+}
+
+.designer-info p {
+    color: #FF9AAE;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.designer-bio {
+    color: #A89B9F;
+    font-size: 0.85rem;
+    margin-bottom: 0.8rem;
+    line-height: 1.4;
+}
+
+.designer-contact {
+    display: flex;
+    gap: 1rem;
+}
+
+.designer-contact a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #F0F0F0;
+    padding: 6px 14px;
+    border-radius: 40px;
+    font-size: 0.8rem;
+    text-decoration: none;
+    transition: 0.2s;
+    font-weight: bold;
+}
+
+.designer-contact a.contact-whatsapp {
+    background: #25D36610;
+    color: #25D366;
+    border: 1px solid #25D36630;
+}
+
+.designer-contact a.contact-whatsapp:hover {
+    background: #25D366;
+    color: white;
+    transform: scale(1.03);
+}
+
+.designer-contact a.contact-instagram {
+    background: #E4405F10;
+    color: #E4405F;
+    border: 1px solid #E4405F30;
+}
+
+.designer-contact a.contact-instagram:hover {
+    background: #E4405F;
+    color: white;
+    transform: scale(1.03);
+}
+
+/* تنسيق للشاشات الصغيرة */
+@media (max-width: 768px) {
+    .designer-card {
+        flex-direction: column;
+        text-align: center;
+        padding: 1.5rem;
+        gap: 0.8rem;
+    }
+    .designer-contact {
+        justify-content: center;
+    }
+    .designer-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 1.6rem;
+    }
+}

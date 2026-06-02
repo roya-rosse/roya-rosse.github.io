@@ -54,6 +54,12 @@ function showToast(message, isError = false) {
 
 async function loadData() {
     showLoading();
+    // مهلة 5 ثوانٍ لإخفاء شاشة التحميل مهما حدث
+    const loadingTimeout = setTimeout(() => {
+        hideLoading();
+        showToast("جاري تحميل باقي البيانات...", false);
+    }, 5000);
+
     try {
         const [catSnap, prodSnap, adsSnap] = await Promise.all([
             database.ref('categories').once('value'),
@@ -84,12 +90,16 @@ async function loadData() {
         renderCategories();
         renderAds();
         renderRandomProducts();
+        
+        // إذا اكتملت البيانات قبل انتهاء المهلة، نلغي المهلة ونخفي التحميل فوراً
+        clearTimeout(loadingTimeout);
         hideLoading();
         initAllSliders();
     } catch (err) { 
         console.error(err); 
-        alert("خطأ في تحميل البيانات: " + err.message); 
-        hideLoading(); 
+        clearTimeout(loadingTimeout);
+        hideLoading();
+        showToast("خطأ في تحميل البيانات: " + err.message, true);
     }
 }
 
@@ -99,7 +109,7 @@ async function saveCategories() {
     await database.ref('categories').set(obj);
 }
 
-// ========== دوال أزرار المنتجات (مع تبديل الاتجاه) ==========
+// ========== دوال أزرار المنتجات ==========
 function initSlider(sliderId, prevBtnId, nextBtnId) {
     const slider = document.getElementById(sliderId);
     const prevBtn = document.getElementById(prevBtnId);
@@ -130,10 +140,8 @@ function initSlider(sliderId, prevBtnId, nextBtnId) {
         const gap = parseInt(getComputedStyle(slider).gap) || 16;
         const amount = cardWidth + gap;
         if (direction === 'next') {
-            // زر التالي (الأيسر) -> يمرر للأمام (إلى اليسار) -> زيادة scrollLeft
             slider.scrollBy({ left: amount, behavior: 'smooth' });
         } else {
-            // زر السابق (الأيمن) -> يمرر للخلف (إلى اليمين) -> نقصان scrollLeft
             slider.scrollBy({ left: -amount, behavior: 'smooth' });
         }
     }
@@ -147,9 +155,6 @@ function initSlider(sliderId, prevBtnId, nextBtnId) {
     const finalPrev = document.getElementById(prevBtnId);
     const finalNext = document.getElementById(nextBtnId);
     
-    // 🔄 تبديل مهام الأزرار:
-    // الزر الأيمن (السابق سابقاً) -> أصبح يقوم بـ 'next' (للأمام)
-    // الزر الأيسر (التالي سابقاً) -> أصبح يقوم بـ 'prev' (للخلف)
     finalPrev.onclick = () => scrollStep('next');
     finalNext.onclick = () => scrollStep('prev');
     
@@ -172,7 +177,7 @@ function renderRandomProducts() {
     const randomItems = shuffled.slice(0, 10);
     container.innerHTML = randomItems.map(p => `
         <div class="product-card" data-product-id="${p.id}">
-            <img src="${p.image}" class="product-img" onerror="this.src='https://via.placeholder.com/300x500?text=صورة+غير+متوفرة'">
+            <img src="${p.image}" class="product-img" loading="lazy" onerror="this.src='https://via.placeholder.com/300x500?text=صورة+غير+متوفرة'">
             <div class="product-info">
                 <div class="product-name">${escapeHtml(p.name)}</div>
                 <div><span class="product-price">${p.price}$ </span>${p.oldprice ? `<span class="product-oldprice">${p.oldprice}$ </span>` : ''}</div>
@@ -212,7 +217,7 @@ function showProductsByCategory(catId) {
     } else {
         scrollDiv.innerHTML = catProducts.map(p => `
             <div class="product-card" data-product-id="${p.id}">
-                <img src="${p.image}" class="product-img" onerror="this.src='https://via.placeholder.com/300x500?text=صورة+غير+متوفرة'">
+                <img src="${p.image}" class="product-img" loading="lazy" onerror="this.src='https://via.placeholder.com/300x500?text=صورة+غير+متوفرة'">
                 <div class="product-info">
                     <div class="product-name">${escapeHtml(p.name)}</div>
                     <div><span class="product-price">${p.price}$ </span>${p.oldprice ? `<span class="product-oldprice">${p.oldprice}$ </span>` : ''}</div>
@@ -245,7 +250,7 @@ function openProductModal(product) {
     const codeSpan = document.getElementById('productCodeDisplay');
     const productCode = product.code || generateTempCode();
     detailsDiv.innerHTML = `
-        <img src="${product.image}" class="product-modal-img" id="productModalImage" style="cursor: pointer;" onerror="this.src='https://via.placeholder.com/300x500?text=صورة+غير+متوفرة'">
+        <img src="${product.image}" class="product-modal-img" id="productModalImage" style="cursor: pointer;" loading="lazy" onerror="this.src='https://via.placeholder.com/300x500?text=صورة+غير+متوفرة'">
         <h3 style="color:#5E4B56; margin:0.5rem 0;">${escapeHtml(product.name)}</h3>
         <p style="color:#A89B9F;">${escapeHtml(product.desc || '')}</p>
         <p style="font-size:1.2rem; font-weight:bold; color:#D58B9A; margin:0.5rem 0;">${product.price} $</p>
@@ -299,7 +304,7 @@ function renderAds() {
     activeAds.forEach((ad, i) => {
         const slideDiv = document.createElement('div');
         slideDiv.className = 'ad-slide' + (i === 0 ? ' active' : '');
-        slideDiv.innerHTML = `<img src="${ad.image}" onerror="this.src='https://via.placeholder.com/1200x400?text=صورة+غير+متوفرة'">${ad.text ? `<div class="ad-text">${escapeHtml(ad.text)}</div>` : ''}`;
+        slideDiv.innerHTML = `<img src="${ad.image}" loading="lazy" onerror="this.src='https://via.placeholder.com/1200x400?text=صورة+غير+متوفرة'">${ad.text ? `<div class="ad-text">${escapeHtml(ad.text)}</div>` : ''}`;
         slider.appendChild(slideDiv);
     });
     currentAdIndex = 0;
@@ -355,7 +360,7 @@ function performSearch(keyword) {
     } else {
         scrollDiv.innerHTML = filtered.map(p => `
             <div class="product-card" data-product-id="${p.id}">
-                <img src="${p.image}" class="product-img" onerror="this.src='https://via.placeholder.com/300x500?text=صورة+غير+متوفرة'">
+                <img src="${p.image}" class="product-img" loading="lazy" onerror="this.src='https://via.placeholder.com/300x500?text=صورة+غير+متوفرة'">
                 <div class="product-info">
                     <div class="product-name">${escapeHtml(p.name)}</div>
                     <div class="product-price">${p.price} $</div>
